@@ -8,10 +8,11 @@ info:
 
     Some useful links:
 
-    - [The Pet Watch and Chill
+
+    * [The Pet Watch and Chill
     repository](https://github.com/lago-morph/chiller)
 
-    - [Design document corresponding to this version of the
+    * [Design document corresponding to this version of the
     API](https://github.com/lago-morph/chiller/wiki/Let's-Watch-design)
   license:
     name: Apache 2.0
@@ -23,120 +24,113 @@ tags:
   - name: user
     description: Operations about user
 paths:
-  /user:
+  /user/login/{username}:
+    get:
+      tags:
+        - user
+      summary: Log in as user
+      description: Log in as the specified user and get the authentication token
+      operationId: loginUser
+      requestBody:
+        description: ''
+      responses:
+        '200':
+          description: Successful login
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWT'
+        '404':
+          description: User not found
+          content: {}
+          headers: {}
+      parameters:
+        - in: path
+          name: username
+          description: Username to log in as
+          schema:
+            type: string
+          required: true
+    parameters: []
+  /user/create:
     post:
       tags:
         - user
-      summary: Create user
-      description: This can only be done by the logged in user.
-      operationId: createUser
-      requestBody:
-        description: Created user object
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        default:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-  /user/logout:
-    get:
-      tags:
-        - user
-      summary: Logs out current logged in user session
+      summary: Create a new user
       description: ''
-      operationId: logoutUser
+      operationId: createUser
       parameters: []
       responses:
-        default:
-          description: successful operation
-  /user/{username}:
-    get:
-      tags:
-        - user
-      summary: Get user by user name
-      description: ''
-      operationId: getUserByName
-      parameters:
-        - name: username
-          in: path
-          description: 'The name that needs to be fetched. Use user1 for testing. '
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
+        '201':
+          description: User created successfully
+          content: {}
+          headers: {}
         '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
-    put:
-      tags:
-        - user
-      summary: Update user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      parameters:
-        - name: username
-          in: path
-          description: name that need to be deleted
-          required: true
-          schema:
-            type: string
+          description: User object validation error
+          content: {}
+          headers: {}
+        '403':
+          description: Duplicate user name
+          content: {}
+          headers: {}
       requestBody:
-        description: Update an existent user in the store
+        description: ''
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
+  /movies/list/{userID}:
+    summary: Get list of movies for a user
+    get:
+      summary: Get the list of movies for a user
+      description: ''
+      operationId: listMovies
       responses:
-        default:
-          description: successful operation
-    delete:
-      tags:
-        - user
-      summary: Delete user
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
-      parameters:
-        - name: username
-          in: path
-          description: The name that needs to be deleted
-          required: true
-          schema:
-            type: string
-      responses:
-        '400':
-          description: Invalid username supplied
+        '200':
+          description: Movie list for user (may be empty)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+                description: Movie list
         '404':
-          description: User not found
+          description: User ID not found
+          content: &ref_0 {}
+          headers: &ref_1 {}
+      tags: &ref_2
+        - movies
+      parameters: &ref_3
+        - in: path
+          name: userID
+          description: ''
+          schema:
+            type: integer
+          required: true
+  /movies/add/{userID}:
+    summary: Get list of movies for a user
+    post:
+      summary: Add a movie to user's list
+      description: ''
+      operationId: addMovie
+      responses:
+        '200':
+          description: Movie added
+        '400':
+          description: Movie object validation error
+          content: *ref_0
+          headers: *ref_1
+      tags: *ref_2
+      parameters: *ref_3
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+              description: Movie to add to user list
 components:
   schemas:
     User:
@@ -151,3 +145,21 @@ components:
           example: theUser
       xml:
         name: user
+    JWT:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token
+      description: JWT token
+      required:
+        - token
+    Movie:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the movie
+      description: Movie object
+      required:
+        - name
