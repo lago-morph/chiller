@@ -1,19 +1,13 @@
 openapi: 3.0.3
 info:
   title: Watch and Chill
-  description: >-
-    This is a sample application for demonstrating CI/CD using GitOps and
-    Kubernetes.
-
+  description: |-
+    This is a sample application for demonstrating CI/CD using GitOps and Kubernetes.
 
     Some useful links:
 
-
-    * [The Pet Watch and Chill
-    repository](https://github.com/lago-morph/chiller)
-
-    * [Design document corresponding to this version of the
-    API](https://github.com/lago-morph/chiller/wiki/Let's-Watch-design)
+    * [The Pet Watch and Chill repository](https://github.com/lago-morph/chiller)
+    * [Design document corresponding to this version of the API](https://github.com/lago-morph/chiller/wiki/Let's-Watch-design)
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -31,8 +25,6 @@ paths:
       summary: Log in as user
       description: Log in as the specified user and get the authentication token
       operationId: loginUser
-      requestBody:
-        description: ''
       responses:
         '200':
           description: Successful login
@@ -43,12 +35,10 @@ paths:
                 $ref: '#/components/schemas/JWT'
         '404':
           description: User not found
-          content: {}
-          headers: {}
-      parameters:
+      parameters: &Username_in_path
         - in: path
           name: username
-          description: Username to log in as
+          description: Username
           schema:
             type: string
           required: true
@@ -64,18 +54,16 @@ paths:
       responses:
         '201':
           description: User created successfully
-          content: {}
-          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '400':
           description: User object validation error
-          content: {}
-          headers: {}
         '403':
           description: Duplicate user name
-          content: {}
-          headers: {}
       requestBody:
-        description: ''
+        description: 'User to create'
         content:
           application/json:
             schema:
@@ -98,11 +86,9 @@ paths:
                 description: Movie list
         '404':
           description: User ID not found
-          content: &ref_0 {}
-          headers: &ref_1 {}
-      tags: &ref_2
+      tags: &movies_tag
         - movies
-      parameters: &ref_3
+      parameters: &userID_in_path
         - in: path
           name: userID
           description: ''
@@ -110,7 +96,7 @@ paths:
             type: integer
           required: true
   /movies/add/{userID}:
-    summary: Get list of movies for a user
+    summary: Add to list of movies for a user
     post:
       summary: Add a movie to user's list
       description: ''
@@ -120,17 +106,15 @@ paths:
           description: Movie added
         '400':
           description: Movie object validation error
-          content: *ref_0
-          headers: *ref_1
-      tags: *ref_2
-      parameters: *ref_3
+      tags: *movies_tag
+      parameters: *userID_in_path
       requestBody:
-        description: ''
+        description: Movie to add to user list
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Movie'
-              description: Movie to add to user list
+            
 components:
   schemas:
     User:
@@ -151,6 +135,7 @@ components:
         token:
           type: string
           description: JWT token
+          example: abcdEF.qwer45ty.token
       description: JWT token
       required:
         - token
