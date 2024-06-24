@@ -4,8 +4,8 @@ All URIs are relative to */*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**add_movie**](MoviesApi.md#add_movie) | **POST** /movies/add/{userID} | Add a movie to user&#x27;s list
-[**list_movies**](MoviesApi.md#list_movies) | **GET** /movies/list/{userID} | Get the list of movies for a user
+[**add_movie**](MoviesApi.md#add_movie) | **POST** /movies/add/{user_id} | Add a movie to user&#x27;s list
+[**list_movies**](MoviesApi.md#list_movies) | **GET** /movies/list/{user_id} | Get the list of movies for a user
 
 # **add_movie**
 > add_movie(user_id, body=body)

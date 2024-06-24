@@ -125,45 +125,45 @@ class UserApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def login_user(self, username, **kwargs):  # noqa: E501
+    def login_user(self, user_name, **kwargs):  # noqa: E501
         """Log in as user  # noqa: E501
 
         Log in as the specified user and get the authentication token  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.login_user(username, async_req=True)
+        >>> thread = api.login_user(user_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str username: Username (required)
+        :param str user_name: Username (required)
         :return: JWT
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.login_user_with_http_info(username, **kwargs)  # noqa: E501
+            return self.login_user_with_http_info(user_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.login_user_with_http_info(username, **kwargs)  # noqa: E501
+            (data) = self.login_user_with_http_info(user_name, **kwargs)  # noqa: E501
             return data
 
-    def login_user_with_http_info(self, username, **kwargs):  # noqa: E501
+    def login_user_with_http_info(self, user_name, **kwargs):  # noqa: E501
         """Log in as user  # noqa: E501
 
         Log in as the specified user and get the authentication token  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.login_user_with_http_info(username, async_req=True)
+        >>> thread = api.login_user_with_http_info(user_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str username: Username (required)
+        :param str user_name: Username (required)
         :return: JWT
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['username']  # noqa: E501
+        all_params = ['user_name']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -178,16 +178,16 @@ class UserApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'username' is set
-        if ('username' not in params or
-                params['username'] is None):
-            raise ValueError("Missing the required parameter `username` when calling `login_user`")  # noqa: E501
+        # verify the required parameter 'user_name' is set
+        if ('user_name' not in params or
+                params['user_name'] is None):
+            raise ValueError("Missing the required parameter `user_name` when calling `login_user`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
-        if 'username' in params:
-            path_params['username'] = params['username']  # noqa: E501
+        if 'user_name' in params:
+            path_params['user_name'] = params['user_name']  # noqa: E501
 
         query_params = []
 
@@ -205,7 +205,7 @@ class UserApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/user/login/{username}', 'GET',
+            '/user/login/{user_name}', 'GET',
             path_params,
             query_params,
             header_params,

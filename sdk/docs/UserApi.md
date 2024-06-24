@@ -5,7 +5,7 @@ All URIs are relative to */*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**create_user**](UserApi.md#create_user) | **POST** /user/create | Create a new user
-[**login_user**](UserApi.md#login_user) | **GET** /user/login/{username} | Log in as user
+[**login_user**](UserApi.md#login_user) | **GET** /user/login/{user_name} | Log in as user
 
 # **create_user**
 > User create_user(body=body)
@@ -54,7 +54,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **login_user**
-> JWT login_user(username)
+> JWT login_user(user_name)
 
 Log in as user
 
@@ -70,11 +70,11 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = chiller_api_client.UserApi()
-username = 'username_example' # str | Username
+user_name = 'user_name_example' # str | Username
 
 try:
     # Log in as user
-    api_response = api_instance.login_user(username)
+    api_response = api_instance.login_user(user_name)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling UserApi->login_user: %s\n" % e)
@@ -84,7 +84,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **username** | **str**| Username | 
+ **user_name** | **str**| Username | 
 
 ### Return type
 

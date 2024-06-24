@@ -80,10 +80,10 @@ All URIs are relative to */*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*MoviesApi* | [**add_movie**](docs/MoviesApi.md#add_movie) | **POST** /movies/add/{userID} | Add a movie to user&#x27;s list
-*MoviesApi* | [**list_movies**](docs/MoviesApi.md#list_movies) | **GET** /movies/list/{userID} | Get the list of movies for a user
+*MoviesApi* | [**add_movie**](docs/MoviesApi.md#add_movie) | **POST** /movies/add/{user_id} | Add a movie to user&#x27;s list
+*MoviesApi* | [**list_movies**](docs/MoviesApi.md#list_movies) | **GET** /movies/list/{user_id} | Get the list of movies for a user
 *UserApi* | [**create_user**](docs/UserApi.md#create_user) | **POST** /user/create | Create a new user
-*UserApi* | [**login_user**](docs/UserApi.md#login_user) | **GET** /user/login/{username} | Log in as user
+*UserApi* | [**login_user**](docs/UserApi.md#login_user) | **GET** /user/login/{user_name} | Log in as user
 
 ## Documentation For Models
 

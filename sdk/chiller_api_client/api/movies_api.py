@@ -94,7 +94,7 @@ class MoviesApi(object):
 
         path_params = {}
         if 'user_id' in params:
-            path_params['userID'] = params['user_id']  # noqa: E501
+            path_params['user_id'] = params['user_id']  # noqa: E501
 
         query_params = []
 
@@ -114,7 +114,7 @@ class MoviesApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/movies/add/{userID}', 'POST',
+            '/movies/add/{user_id}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -189,7 +189,7 @@ class MoviesApi(object):
 
         path_params = {}
         if 'user_id' in params:
-            path_params['userID'] = params['user_id']  # noqa: E501
+            path_params['user_id'] = params['user_id']  # noqa: E501
 
         query_params = []
 
@@ -207,7 +207,7 @@ class MoviesApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/movies/list/{userID}', 'GET',
+            '/movies/list/{user_id}', 'GET',
             path_params,
             query_params,
             header_params,

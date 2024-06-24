@@ -29,23 +29,23 @@ class User(object):
     """
     swagger_types = {
         'id': 'int',
-        'username': 'str'
+        'name': 'str'
     }
 
     attribute_map = {
         'id': 'id',
-        'username': 'username'
+        'name': 'name'
     }
 
-    def __init__(self, id=None, username=None):  # noqa: E501
+    def __init__(self, id=None, name=None):  # noqa: E501
         """User - a model defined in Swagger"""  # noqa: E501
         self._id = None
-        self._username = None
+        self._name = None
         self.discriminator = None
         if id is not None:
             self.id = id
-        if username is not None:
-            self.username = username
+        if name is not None:
+            self.name = name
 
     @property
     def id(self):
@@ -69,25 +69,25 @@ class User(object):
         self._id = id
 
     @property
-    def username(self):
-        """Gets the username of this User.  # noqa: E501
+    def name(self):
+        """Gets the name of this User.  # noqa: E501
 
 
-        :return: The username of this User.  # noqa: E501
+        :return: The name of this User.  # noqa: E501
         :rtype: str
         """
-        return self._username
+        return self._name
 
-    @username.setter
-    def username(self, username):
-        """Sets the username of this User.
+    @name.setter
+    def name(self, name):
+        """Sets the name of this User.
 
 
-        :param username: The username of this User.  # noqa: E501
+        :param name: The name of this User.  # noqa: E501
         :type: str
         """
 
-        self._username = username
+        self._name = name
 
     def to_dict(self):
         """Returns the model properties as a dict"""
