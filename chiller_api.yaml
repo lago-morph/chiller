@@ -18,7 +18,7 @@ tags:
   - name: user
     description: Operations about user
 paths:
-  /user/login/{username}:
+  /user/login/{user_name}:
     get:
       tags:
         - user
@@ -37,7 +37,7 @@ paths:
           description: User not found
       parameters: &Username_in_path
         - in: path
-          name: username
+          name: user_name
           description: Username
           schema:
             type: string
@@ -68,7 +68,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
-  /movies/list/{userID}:
+  /movies/list/{user_id}:
     summary: Get list of movies for a user
     get:
       summary: Get the list of movies for a user
@@ -90,12 +90,12 @@ paths:
         - movies
       parameters: &userID_in_path
         - in: path
-          name: userID
+          name: user_id
           description: ''
           schema:
             type: integer
           required: true
-  /movies/add/{userID}:
+  /movies/add/{user_id}:
     summary: Add to list of movies for a user
     post:
       summary: Add a movie to user's list
@@ -124,7 +124,7 @@ components:
           type: integer
           format: int64
           example: 10
-        username:
+        name:
           type: string
           example: theUser
       xml:
