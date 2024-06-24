@@ -20,7 +20,7 @@ tags:
 - name: user
   description: Operations about user
 paths:
-  /user/login/{username}:
+  /user/login/{user_name}:
     get:
       tags:
       - user
@@ -28,7 +28,7 @@ paths:
       description: Log in as the specified user and get the authentication token
       operationId: login_user
       parameters:
-      - name: username
+      - name: user_name
         in: path
         description: Username
         required: true
@@ -72,7 +72,7 @@ paths:
         "403":
           description: Duplicate user name
       x-openapi-router-controller: chiller_api.controllers.user_controller
-  /movies/list/{userID}:
+  /movies/list/{user_id}:
     summary: Get list of movies for a user
     get:
       tags:
@@ -81,7 +81,7 @@ paths:
       description: ""
       operationId: list_movies
       parameters:
-      - name: userID
+      - name: user_id
         in: path
         description: ""
         required: true
@@ -103,7 +103,7 @@ paths:
         "404":
           description: User ID not found
       x-openapi-router-controller: chiller_api.controllers.movies_controller
-  /movies/add/{userID}:
+  /movies/add/{user_id}:
     summary: Add to list of movies for a user
     post:
       tags:
@@ -112,7 +112,7 @@ paths:
       description: ""
       operationId: add_movie
       parameters:
-      - name: userID
+      - name: user_id
         in: path
         description: ""
         required: true
@@ -141,12 +141,12 @@ components:
           type: integer
           format: int64
           example: 10
-        username:
+        name:
           type: string
           example: theUser
       example:
+        name: theUser
         id: 10
-        username: theUser
       xml:
         name: user
     JWT:

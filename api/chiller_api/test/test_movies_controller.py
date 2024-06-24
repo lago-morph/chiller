@@ -18,8 +18,9 @@ class TestMoviesController(BaseTestCase):
         Add a movie to user's list
         """
         body = Movie()
+        body.name = "test name"
         response = self.client.open(
-            '/movies/add/{userID}'.format(user_id=56),
+            '/movies/add/{user_id}'.format(user_id=56),
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
@@ -32,7 +33,7 @@ class TestMoviesController(BaseTestCase):
         Get the list of movies for a user
         """
         response = self.client.open(
-            '/movies/list/{userID}'.format(user_id=56),
+            '/movies/list/{user_id}'.format(user_id=56),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

@@ -14,25 +14,25 @@ class User(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, username: str=None):  # noqa: E501
+    def __init__(self, id: int=None, name: str=None):  # noqa: E501
         """User - a model defined in Swagger
 
         :param id: The id of this User.  # noqa: E501
         :type id: int
-        :param username: The username of this User.  # noqa: E501
-        :type username: str
+        :param name: The name of this User.  # noqa: E501
+        :type name: str
         """
         self.swagger_types = {
             'id': int,
-            'username': str
+            'name': str
         }
 
         self.attribute_map = {
             'id': 'id',
-            'username': 'username'
+            'name': 'name'
         }
         self._id = id
-        self._username = username
+        self._name = name
 
     @classmethod
     def from_dict(cls, dikt) -> 'User':
@@ -67,22 +67,22 @@ class User(Model):
         self._id = id
 
     @property
-    def username(self) -> str:
-        """Gets the username of this User.
+    def name(self) -> str:
+        """Gets the name of this User.
 
 
-        :return: The username of this User.
+        :return: The name of this User.
         :rtype: str
         """
-        return self._username
+        return self._name
 
-    @username.setter
-    def username(self, username: str):
-        """Sets the username of this User.
+    @name.setter
+    def name(self, name: str):
+        """Sets the name of this User.
 
 
-        :param username: The username of this User.
-        :type username: str
+        :param name: The name of this User.
+        :type name: str
         """
 
-        self._username = username
+        self._name = name

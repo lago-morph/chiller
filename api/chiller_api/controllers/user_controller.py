@@ -21,13 +21,13 @@ def create_user(body=None):  # noqa: E501
     return 'do some magic!'
 
 
-def login_user(username):  # noqa: E501
+def login_user(user_name):  # noqa: E501
     """Log in as user
 
     Log in as the specified user and get the authentication token # noqa: E501
 
-    :param username: Username
-    :type username: str
+    :param user_name: Username
+    :type user_name: str
 
     :rtype: JWT
     """
