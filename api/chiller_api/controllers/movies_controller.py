@@ -2,6 +2,7 @@ import connexion
 import six
 
 from chiller_api.models.movie import Movie  # noqa: E501
+from chiller_api.models.movie_list import MovieList  # noqa: E501
 from chiller_api import util
 
 
@@ -10,7 +11,7 @@ def add_movie(user_id, body=None):  # noqa: E501
 
      # noqa: E501
 
-    :param user_id: 
+    :param user_id: user ID
     :type user_id: int
     :param body: Movie to add to user list
     :type body: dict | bytes
@@ -27,9 +28,9 @@ def list_movies(user_id):  # noqa: E501
 
      # noqa: E501
 
-    :param user_id: 
+    :param user_id: user ID
     :type user_id: int
 
-    :rtype: List[Movie]
+    :rtype: MovieList
     """
     return 'do some magic!'
