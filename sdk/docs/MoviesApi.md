@@ -22,7 +22,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = chiller_api_client.MoviesApi()
-user_id = 56 # int | 
+user_id = 56 # int | user ID
 body = chiller_api_client.Movie() # Movie | Movie to add to user list (optional)
 
 try:
@@ -36,7 +36,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **user_id** | **int**|  | 
+ **user_id** | **int**| user ID | 
  **body** | [**Movie**](Movie.md)| Movie to add to user list | [optional] 
 
 ### Return type
@@ -55,7 +55,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_movies**
-> list[Movie] list_movies(user_id)
+> MovieList list_movies(user_id)
 
 Get the list of movies for a user
 
@@ -69,7 +69,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = chiller_api_client.MoviesApi()
-user_id = 56 # int | 
+user_id = 56 # int | user ID
 
 try:
     # Get the list of movies for a user
@@ -83,11 +83,11 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **user_id** | **int**|  | 
+ **user_id** | **int**| user ID | 
 
 ### Return type
 
-[**list[Movie]**](Movie.md)
+[**MovieList**](MovieList.md)
 
 ### Authorization
 
