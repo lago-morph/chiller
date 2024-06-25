@@ -72,7 +72,6 @@ paths:
     summary: Get list of movies for a user
     get:
       summary: Get the list of movies for a user
-      description: ''
       operationId: listMovies
       responses:
         '200':
@@ -80,10 +79,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Movie'
-                description: Movie list
+                $ref: '#/components/schemas/MovieList'
         '404':
           description: User ID not found
       tags: &movies_tag
@@ -91,7 +87,7 @@ paths:
       parameters: &userID_in_path
         - in: path
           name: user_id
-          description: ''
+          description: 'user ID'
           schema:
             type: integer
           required: true
@@ -106,6 +102,8 @@ paths:
           description: Movie added
         '400':
           description: Movie object validation error
+        '404':
+          description: User ID not found
       tags: *movies_tag
       parameters: *userID_in_path
       requestBody:
@@ -145,6 +143,12 @@ components:
         name:
           type: string
           description: The name of the movie
+          example: "test movie"
       description: Movie object
       required:
         - name
+    MovieList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Movie'
+      description: Movie list
