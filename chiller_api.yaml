@@ -24,7 +24,7 @@ paths:
         - user
       summary: Log in as user
       description: Log in as the specified user and get the authentication token
-      operationId: loginUser
+      operationId: user.login
       responses:
         '200':
           description: Successful login
@@ -49,7 +49,7 @@ paths:
         - user
       summary: Create a new user
       description: ''
-      operationId: createUser
+      operationId: user.create
       parameters: []
       responses:
         '201':
@@ -72,7 +72,7 @@ paths:
     summary: Get list of movies for a user
     get:
       summary: Get the list of movies for a user
-      operationId: listMovies
+      operationId: movies.list
       responses:
         '200':
           description: Movie list for user (may be empty)
@@ -96,7 +96,7 @@ paths:
     post:
       summary: Add a movie to user's list
       description: ''
-      operationId: addMovie
+      operationId: movies.add
       responses:
         '200':
           description: Movie added

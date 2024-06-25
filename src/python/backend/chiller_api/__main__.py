@@ -10,6 +10,8 @@ def main():
     app.app.json_encoder = encoder.JSONEncoder
     app.add_api('swagger.yaml', arguments={'title': 'Watch and Chill'}, pythonic_params=True)
     app.run(port=8080)
+    from db import db
+    db.init_app(app.app)
 
 
 if __name__ == '__main__':

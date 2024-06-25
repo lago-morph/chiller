@@ -12,123 +12,107 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.1
-servers:
-- url: /
 tags:
-- name: movies
-  description: Lists of movies
-- name: user
-  description: Operations about user
+  - name: movies
+    description: Lists of movies
+  - name: user
+    description: Operations about user
 paths:
   /user/login/{user_name}:
     get:
       tags:
-      - user
+        - user
       summary: Log in as user
       description: Log in as the specified user and get the authentication token
-      operationId: login_user
-      parameters:
-      - name: user_name
-        in: path
-        description: Username
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+      operationId: user.login
       responses:
-        "200":
+        '200':
           description: Successful login
+          headers: {}
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JWT'
-        "404":
+        '404':
           description: User not found
-      x-openapi-router-controller: chiller_api.controllers.user_controller
+      parameters: &Username_in_path
+        - in: path
+          name: user_name
+          description: Username
+          schema:
+            type: string
+          required: true
+    parameters: []
   /user/create:
     post:
       tags:
-      - user
+        - user
       summary: Create a new user
-      description: ""
-      operationId: create_user
+      description: ''
+      operationId: user.create
       parameters: []
-      requestBody:
-        description: User to create
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
       responses:
-        "201":
+        '201':
           description: User created successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        "400":
+        '400':
           description: User object validation error
-        "403":
+        '403':
           description: Duplicate user name
-      x-openapi-router-controller: chiller_api.controllers.user_controller
+      requestBody:
+        description: 'User to create'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
   /movies/list/{user_id}:
     summary: Get list of movies for a user
     get:
-      tags:
-      - movies
       summary: Get the list of movies for a user
-      operationId: list_movies
-      parameters:
-      - name: user_id
-        in: path
-        description: user ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: integer
+      operationId: movies.list
       responses:
-        "200":
+        '200':
           description: Movie list for user (may be empty)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MovieList'
-        "404":
+        '404':
           description: User ID not found
-      x-openapi-router-controller: chiller_api.controllers.movies_controller
+      tags: &movies_tag
+        - movies
+      parameters: &userID_in_path
+        - in: path
+          name: user_id
+          description: 'user ID'
+          schema:
+            type: integer
+          required: true
   /movies/add/{user_id}:
     summary: Add to list of movies for a user
     post:
-      tags:
-      - movies
       summary: Add a movie to user's list
-      description: ""
-      operationId: add_movie
-      parameters:
-      - name: user_id
-        in: path
-        description: user ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: integer
+      description: ''
+      operationId: movies.add
+      responses:
+        '200':
+          description: Movie added
+        '400':
+          description: Movie object validation error
+        '404':
+          description: User ID not found
+      tags: *movies_tag
+      parameters: *userID_in_path
       requestBody:
         description: Movie to add to user list
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Movie'
-      responses:
-        "200":
-          description: Movie added
-        "400":
-          description: Movie object validation error
-        "404":
-          description: User ID not found
-      x-openapi-router-controller: chiller_api.controllers.movies_controller
+            
 components:
   schemas:
     User:
@@ -141,14 +125,9 @@ components:
         name:
           type: string
           example: theUser
-      example:
-        name: theUser
-        id: 10
       xml:
         name: user
     JWT:
-      required:
-      - token
       type: object
       properties:
         token:
@@ -156,23 +135,20 @@ components:
           description: JWT token
           example: abcdEF.qwer45ty.token
       description: JWT token
-      example:
-        token: abcdEF.qwer45ty.token
-    Movie:
       required:
-      - name
+        - token
+    Movie:
       type: object
       properties:
         name:
           type: string
           description: The name of the movie
-          example: test movie
+          example: "test movie"
       description: Movie object
-      example:
-        name: test movie
+      required:
+        - name
     MovieList:
       type: array
-      description: Movie list
       items:
         $ref: '#/components/schemas/Movie'
-
+      description: Movie list
