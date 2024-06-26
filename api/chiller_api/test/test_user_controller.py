@@ -12,7 +12,7 @@ from chiller_api.test import BaseTestCase
 from chiller_api.db import queries
 
 
-class TestUserCreateControllerSuccess(BaseTestCase):
+class TestUserControllerCreateSuccess(BaseTestCase):
     """UserController integration test stubs"""
 
     def test_create_user(self):
@@ -20,28 +20,25 @@ class TestUserCreateControllerSuccess(BaseTestCase):
 
         Create a new user
         """
-        body = User()
+        body = User(name="bob")
         response = self.client.open(
             '/user/create',
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
-        self.assert200(response,
+        self.assert201(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-class TestUserCreateControllerError(BaseTestCase):
-
-    # need to set up a user for duplicate processing
+class TestUserControllerCreateError(BaseTestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.ct = 'application/json'
 
-        cls.duplicate = "duplicate"
-        queries.add_user(cls.duplicate)
-
     def test_create_user_duplicate(self):
-        d = json.dumps(User(name=self.duplicate))
+        duplicate = "duplicate"
+        queries.add_user(duplicate)
+        d = json.dumps(User(name=duplicate))
         self.assert403(
             self.client.post('/user/create', data=d, content_type=self.ct))
 
@@ -81,6 +78,8 @@ class TestUserCreateControllerError(BaseTestCase):
         self.assert400(
             self.client.post('/user/create', data=d, content_type=self.ct))
 
+
+class TestUserControllerLoginError(BaseTestCase):
 
     def test_login_user(self):
         """Test case for login_user
