@@ -1,3 +1,6 @@
+# ignore the temporary files for the database
+instance
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
