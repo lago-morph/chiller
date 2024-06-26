@@ -11,7 +11,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.1
+  version: 1.0.2
 servers:
 - url: /
 tags:
@@ -63,10 +63,6 @@ paths:
       responses:
         "201":
           description: User created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
         "400":
           description: User object validation error
         "403":
@@ -141,9 +137,6 @@ components:
         name:
           type: string
           example: theUser
-      example:
-        name: theUser
-        id: 10
       xml:
         name: user
     JWT:
