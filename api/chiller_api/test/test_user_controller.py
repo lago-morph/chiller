@@ -11,6 +11,7 @@ from chiller_api.test import BaseTestCase
 
 from chiller_api.db import queries
 
+import jwt
 
 class TestUserControllerCreateSuccess(BaseTestCase):
     """UserController integration test stubs"""
@@ -26,7 +27,7 @@ class TestUserControllerCreateSuccess(BaseTestCase):
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
-        self.assert201(response,
+        self.assertStatus(response, 201,
                        'Response body is : ' + response.data.decode('utf-8'))
 
 class TestUserControllerCreateError(BaseTestCase):
@@ -79,18 +80,53 @@ class TestUserControllerCreateError(BaseTestCase):
             self.client.post('/user/create', data=d, content_type=self.ct))
 
 
-class TestUserControllerLoginError(BaseTestCase):
+class TestUserControllerLoginSuccess(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.ct = 'application/json'
 
     def test_login_user(self):
-        """Test case for login_user
+        name = "bob"
+        queries.add_user(name)
+        response = self.client.get('/user/login/{name}'.format(name=name))
 
-        Log in as user
-        """
-        response = self.client.open(
-            '/user/login/{username}'.format(username='username_example'),
-            method='GET')
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data is not None
+        assert "token" in data
+        payload = jwt.decode(data["token"], options={"verify_signature": False})
+        assert payload is not None
+        assert "name" in payload
+        assert payload["name"] == name
+        assert "id" in payload
+        assert payload["id"] is not None
+
+class TestUserControllerLoginError(BaseTestCase):
+
+    def test_login_user_empty(self):
+        self.assert404(self.client.get('/user/login'))
+        self.assert404(self.client.get('/user/login/'))
+        self.assert404(self.client.get('/user/login//'))
+    
+    # name with invalid characters
+    def test_login_user_invalid_characters(self):
+        self.assert400(self.client.get(
+                    '/user/login/{name}'.format(name=' ')))
+        self.assert400(self.client.get(
+                    '/user/login/{name}'.format(name='abc.de ')))
+        self.assert400(self.client.get(
+                    '/user/login/{name}'.format(name='!<>a--bc:de')))
+        self.assert404(self.client.get(
+                    '/user/login/{name}/'.format(name='!<>a--bc:de')))
+
+    def test_login_user_doesnt_exist(self):
+        self.assert403(self.client.get('/user/login/bob'))
+        self.assert404(self.client.get('/user/login/bob/'))
+
+    def test_login_user_wrong_method(self):
+        self.assert405(self.client.post('/user/login/bob'))
+        self.assert404(self.client.post('/user/login/bob/'))
 
 
 if __name__ == '__main__':
