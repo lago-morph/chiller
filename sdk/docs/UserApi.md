@@ -8,7 +8,7 @@ Method | HTTP request | Description
 [**login_user**](UserApi.md#login_user) | **GET** /user/login/{user_name} | Log in as user
 
 # **create_user**
-> User create_user(body=body)
+> create_user(body=body)
 
 Create a new user
 
@@ -26,8 +26,7 @@ body = chiller_api_client.User() # User | User to create (optional)
 
 try:
     # Create a new user
-    api_response = api_instance.create_user(body=body)
-    pprint(api_response)
+    api_instance.create_user(body=body)
 except ApiException as e:
     print("Exception when calling UserApi->create_user: %s\n" % e)
 ```
@@ -40,7 +39,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**User**](User.md)
+void (empty response body)
 
 ### Authorization
 
@@ -49,7 +48,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
- - **Accept**: application/json
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
