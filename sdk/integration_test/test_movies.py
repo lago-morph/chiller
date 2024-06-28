@@ -57,6 +57,8 @@ class TestMovieAPIFailure():
         with pytest.raises(ApiException) as e:
             response = movies_api.list_movies(9999)
         assert e.value.status == 403
+        print(f"response when user does not exist: {e.value}")
+        print("body: {}".format(e.value.body))
 
 
     def test_movies_add_user_doesnt_exist(self, movies_api):
