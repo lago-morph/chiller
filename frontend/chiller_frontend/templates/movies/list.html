@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Movie List{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  {% for movie in movielist %}
+    <article class="movie">
+      <header>
+        <div>
+          <h1>{{ movie['title'] }}</h1>
+        </div>
+      </header>
+    </article>
+  {% endfor %}
+  <form action= url_for('movies.add') method="post">
+      <label for="title">Title</label>
+      <input name="title" id="title"  required>
+      <input type="submit" value="Add Movie">
+  </form>
+{% endblock %}
