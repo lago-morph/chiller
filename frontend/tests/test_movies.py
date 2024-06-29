@@ -1,83 +1,114 @@
 import pytest
+from flask import g
+from flask import session
+from flask import url_for
 
-from flaskr.db import get_db
+import jwt
+import uuid
 
+from chiller_api_client.api.movies_api import MoviesApi
+from chiller_api_client import Movie
+from chiller_api_client.rest import ApiException
 
-def test_index(client, auth):
-    response = client.get("/")
-    assert b"Log In" in response.data
-    assert b"Register" in response.data
+from pprint import pprint
 
-    auth.login()
-    response = client.get("/")
-    assert b"test title" in response.data
-    assert b"by test on 2018-01-01" in response.data
-    assert b"test\nbody" in response.data
-    assert b'href="/1/update"' in response.data
+# list
+class TestMoviesListSuccess():
+    # success GET list empty list
+    # success GET list one movie
+    # success GET list multiple movies with duplicates
+    @pytest.mark.parametrize("num_movies", (0,1,3))
+    def test_get_list_success(self, client, auth, monkeypatch,num_movies):
+        auth.login()
 
+        l = []
+        for t in range(num_movies):
+            l.append({'title': uuid.uuid4().hex})
+        if num_movies > 2:
+            l.append(l[0])
 
-@pytest.mark.parametrize("path", ("/create", "/1/update", "/1/delete"))
-def test_login_required(client, path):
-    response = client.post(path)
-    assert response.headers["Location"] == "/auth/login"
+        def return_movies(a, *args, **kwargs):
+            return l
 
-
-def test_author_required(app, client, auth):
-    # change the post author to another user
-    with app.app_context():
-        db = get_db()
-        db.execute("UPDATE post SET author_id = 2 WHERE id = 1")
-        db.commit()
-
-    auth.login()
-    # current user can't modify other user's post
-    assert client.post("/1/update").status_code == 403
-    assert client.post("/1/delete").status_code == 403
-    # current user doesn't see edit link
-    assert b'href="/1/update"' not in client.get("/").data
-
-
-@pytest.mark.parametrize("path", ("/2/update", "/2/delete"))
-def test_exists_required(client, auth, path):
-    auth.login()
-    assert client.post(path).status_code == 404
+        monkeypatch.setattr(MoviesApi, "list_movies", return_movies)
+        r = client.get("/movies/list")
+        assert r.status_code == 200
+        for t in l:
+            assert t['title'].encode() in r.data
+        assert f"<!-- { len(l) } elements -->".encode() in r.data
 
 
-def test_create(client, auth, app):
-    auth.login()
-    assert client.get("/create").status_code == 200
-    client.post("/create", data={"title": "created", "body": ""})
 
-    with app.app_context():
-        db = get_db()
-        count = db.execute("SELECT COUNT(id) FROM post").fetchone()[0]
-        assert count == 2
+class TestMoviesListError():
+    pass
+    # error GET list user not logged in - handled in test_user.TestLoginRedirect
+
+    # error GET list user logged in but does not exist in db
+    # this is equivalent to having the list_movies api return an error when the
+    # user is logged in already.  Just make sure this is handled properly
+    def test_list_logged_in_but_error(self, client, auth, monkeypatch):
+        msg = b'a descriptive error'
+        def fail_call(a, *args, **kwargs):
+            e = ApiException()
+            e.body = msg
+            raise e
+        monkeypatch.setattr(MoviesApi, "list_movies", fail_call)
+        auth.login()
+        r = client.get("/movies/list")
+        assert r.status_code == 200
+        assert msg in r.data
+
+    # error POST list wrong method
+    def test_list_wrong_method(self, client, auth):
+        auth.login()
+        r = client.post("/movies/list")
+        assert r.status_code == 405
+
+# add
+class TestMoviesAddSuccess():
+
+    # success POST add successful
+    def test_post_add_success(self, client, auth, monkeypatch): 
+        def do_nothing(a, *args, **kwargs):
+            pass
+        monkeypatch.setattr(MoviesApi, "add_movie", do_nothing)
+  
+        auth.login()
+        with client:
+            r = client.post("/movies/add", data=Movie("test title").to_dict())
+            assert r.headers["Location"] == url_for('movies.list')
+        assert r.status_code == 302 or r.status_code == 303
+
+class TestMoviesAddError():
+
+    # error POST add title empty
+    @pytest.mark.parametrize("data", (
+        None, 
+        {"title": None}, 
+        {"title": ""}, 
+        {"key": "value"} 
+    ))
+    def test_add_missing_title(self, client, data, auth):
+        auth.login()
+        with client:
+            r = client.post("/movies/add", data=data)
+            assert r.headers["Location"] == url_for('movies.list')
+    
+        # we are redirecting from a POST to a GET.  Old way, 302.  New way 303.
+        assert r.status_code == 302 or r.status_code == 303
+
+        # now have to load the redirect to check the flash error message
+        redirect = r.headers["Location"]
+        r2 = client.get(redirect)
+        assert b"Movie title is required" in r2.data
 
 
-def test_update(client, auth, app):
-    auth.login()
-    assert client.get("/1/update").status_code == 200
-    client.post("/1/update", data={"title": "updated", "body": ""})
+    # error POST add title invalid characters - handled as part of integration
 
-    with app.app_context():
-        db = get_db()
-        post = db.execute("SELECT * FROM post WHERE id = 1").fetchone()
-        assert post["title"] == "updated"
+    # error POST add user not logged in - handled in test_user.TestLoginRedirect
 
-
-@pytest.mark.parametrize("path", ("/create", "/1/update"))
-def test_create_update_validate(client, auth, path):
-    auth.login()
-    response = client.post(path, data={"title": "", "body": ""})
-    assert b"Title is required." in response.data
-
-
-def test_delete(client, auth, app):
-    auth.login()
-    response = client.post("/1/delete")
-    assert response.headers["Location"] == "/"
-
-    with app.app_context():
-        db = get_db()
-        post = db.execute("SELECT * FROM post WHERE id = 1").fetchone()
-        assert post is None
+    # error GET add wrong method
+    def test_add_wrong_method(self, client, auth):
+        auth.login()
+        r = client.get("/movies/add")
+        assert r.status_code == 405

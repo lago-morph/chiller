@@ -11,6 +11,25 @@ from chiller_api_client.rest import ApiException
 
 from pprint import pprint
 
+    
+class TestLoginRedirect():
+
+    @pytest.mark.parametrize(("call_path", "use_get"), (
+                                ("/", True),
+                                ("/movies/list", True),
+                                ("/movies/add", False),
+    ))
+    def test_redirects_not_logged_in(self, client, call_path, use_get):
+        with client:
+            if use_get:
+                r = client.get(call_path)
+            else: 
+                r = client.post(call_path)
+
+            # ensure we are redirected to right place
+            assert r.headers["Location"] == url_for('user.login')
+        # we are redirecting from a POST to a GET.  Old way, 302.  New way 303.
+        assert r.status_code == 302 or r.status_code == 303
 
 class TestAuthFixture():
 

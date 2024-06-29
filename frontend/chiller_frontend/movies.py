@@ -13,23 +13,25 @@ from .user import login_required
 
 bp = Blueprint("movies", __name__, url_prefix="/movies")
 
+from pprint import pprint
+
 @bp.route("/list", methods=("GET",))
 @login_required
 def list():
     """
     get the movies in this user's list
     """
-    api = ChillerSDK()
+    w = ChillerSDK()
     error = None
 
-    movielist, msg = api.m.movies_list(g.user["id"])
+    movielist, msg = w.get_movies_list(g.user["id"])
     if movielist is None:
         movielist = []
         error = msg
 
     flash(error)
 
-    return render_template("movies/list.html")
+    return render_template("movies/list.html", movielist=movielist)
 
 
 @bp.route("/add", methods=("POST",))
@@ -37,16 +39,16 @@ def list():
 def add():
     """add a movie to the current user's list
     """
-    api = ChillerSDK()
+    w = ChillerSDK()
     error = None
 
-    title = request.form["title"]
+    rf = request.form
+    key = "title"
 
-    if not title:
+    if key not in rf or rf[key] is None or len(rf[key]) == 0:
         error = "Movie title is required"
-
-    if error is None:
-        success, msg = api.m.movies_add(g.user["id"], title)
+    else:
+        success, msg = w.movies_add(g.user["id"], rf[key])
         if not success:
             error = msg
 

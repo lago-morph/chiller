@@ -57,7 +57,7 @@ class ChillerSDK():
         on failure, result is None and message is descriptive error message
         """
         try:
-            response = self.movies_api.list_movies(user_id)
+            response = self.m.list_movies(user_id)
         except ApiException as e:
             return None, e.body
     

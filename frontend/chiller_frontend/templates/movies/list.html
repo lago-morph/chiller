@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Movie List{% endblock %}</h1>
+<h1>{% block title %}Movie List{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
+<!-- {{ movielist|count}} elements -->
   {% for movie in movielist %}
     <article class="movie">
       <header>

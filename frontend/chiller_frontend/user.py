@@ -95,9 +95,7 @@ def login():
 
         if key not in rf or rf[key] is None or len(rf[key]) == 0:
             flash("Username is required.")
-            pprint("bad username")
         else:
-            pprint("doing user login processing")
             return login_processing(request.form["username"])
 
     return render_template("user/login.html")
