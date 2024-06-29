@@ -22,7 +22,7 @@ def list():
     api = ChillerSDK()
     error = None
 
-    movielist, msg = api.movies_list(g.user["id"])
+    movielist, msg = api.m.movies_list(g.user["id"])
     if movielist is None:
         movielist = []
         error = msg
@@ -46,7 +46,7 @@ def add():
         error = "Movie title is required"
 
     if error is None:
-        success, msg = api.movies_add(g.user["id"], title)
+        success, msg = api.m.movies_add(g.user["id"], title)
         if not success:
             error = msg
 

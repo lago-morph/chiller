@@ -1,6 +1,7 @@
 import functools
 import json
 import jwt
+from pprint import pprint
 
 from flask import Blueprint
 from flask import flash
@@ -40,8 +41,8 @@ def load_logged_in_user():
     if jwt_token is None:
         g.user = None
     else:
-        payload = jwt.decode(jwt_token, options={"verify_signature": False})
-        g.user = json.loads(payload)
+        payload = jwt.decode(jwt_token['token'], options={"verify_signature": False})
+        g.user = payload
         assert "name" in g.user
         assert "id" in g.user
 
@@ -51,17 +52,17 @@ def create():
     """Create a new user.
 
     """
-    api = ChillerSDK()
-    username = request.form["username"]
-    error = None
+    w = ChillerSDK()
 
-    if not username:
+    rf = request.form
+    key = "username"
+
+    if key not in rf or rf[key] is None or len(rf[key]) == 0:
         error = "Username is required."
-
-    if error is None:
-        success, error = api.user_create(username)
+    else:
+        success, error = w.user_create(rf[key])
         if success:
-            return login_processing(username)
+            return login_processing(rf[key])
 
     flash(error)
     return redirect(url_for("user.login"))
@@ -72,9 +73,9 @@ def login_processing(username):
     do all login processing for user
     called from both create and login
     """
-    api = ChillerSDK()
+    w = ChillerSDK()
 
-    jwt_token, msg = api.user_login(username)
+    jwt_token, msg = w.get_user_login(username)
     if jwt_token is not None:
         session.clear()
         session["jwt_token"] = jwt_token
@@ -88,12 +89,16 @@ def login_processing(username):
 def login():
     """Log in a registered user by adding the user id to the session."""
     if request.method == "POST":
-        username = request.form["username"]
 
-        if not username:
+        rf = request.form
+        key = "username"
+
+        if key not in rf or rf[key] is None or len(rf[key]) == 0:
             flash("Username is required.")
+            pprint("bad username")
         else:
-            return login_processing(username)
+            pprint("doing user login processing")
+            return login_processing(request.form["username"])
 
     return render_template("user/login.html")
 

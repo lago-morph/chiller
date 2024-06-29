@@ -1,6 +1,7 @@
-from chiller_api_client import User, ApiClient, UserApi
+from chiller_api_client import User, ApiClient, UserApi, MoviesApi, Movie
 from chiller_api_client.rest import ApiException
 from chiller_api_client.configuration import Configuration
+import os
 
 class ChillerSDK():
 
@@ -12,8 +13,8 @@ class ChillerSDK():
             conf.host = os.environ[hostkey]
         else:
             conf.host = '127.0.0.1:8080'
-        self.user_api = UserApi(ApiClient(conf))
-        self.movies_api = MoviesApi(ApiClient(conf))
+        self.u = UserApi(ApiClient(conf))
+        self.m = MoviesApi(ApiClient(conf))
 
 
     def get_user_login(self, name):
@@ -26,7 +27,7 @@ class ChillerSDK():
         On failure result is None and message is a descriptive error message
         """
         try:
-            response = self.user_api.login_user(name)
+            response = self.u.login_user(name)
         except ApiException as e:
             return None, e.body
     
@@ -41,7 +42,7 @@ class ChillerSDK():
         on failure, result is False and message is descriptive error message
         """
         try:
-            self.user_api.create_user(body=User(name))
+            self.u.create_user(body=User(name))
         except ApiException as e:
             return False, e.body
     

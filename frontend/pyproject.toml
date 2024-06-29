@@ -30,7 +30,7 @@ filterwarnings = ["error"]
 
 [tool.coverage.run]
 branch = true
-source = ["flaskr", "tests"]
+source = ["chiller_frontend", "tests"]
 
 [tool.ruff]
 src = ["src"]

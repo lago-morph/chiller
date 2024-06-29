@@ -1,35 +1,24 @@
 import os
 import tempfile
+from chiller_api_client import User, JWT, UserApi
+import jwt
+from flask import session
 
 import pytest
 
-from flaskr import create_app
-from flaskr.db import get_db
-from flaskr.db import init_db
-
-# read in SQL for populating test data
-with open(os.path.join(os.path.dirname(__file__), "data.sql"), "rb") as f:
-    _data_sql = f.read().decode("utf8")
-
+from chiller_frontend import create_app
 
 @pytest.fixture
 def app():
     """Create and configure a new app instance for each test."""
     # create a temporary file to isolate the database for each test
-    db_fd, db_path = tempfile.mkstemp()
-    # create the app with common test config
-    app = create_app({"TESTING": True, "DATABASE": db_path})
 
-    # create the database and load test data
-    with app.app_context():
-        init_db()
-        get_db().executescript(_data_sql)
+    # create the app with common test config
+    app = create_app({"TESTING": True})
 
     yield app
 
-    # close and remove the temporary database
-    os.close(db_fd)
-    os.unlink(db_path)
+    pass
 
 
 @pytest.fixture
@@ -45,18 +34,39 @@ def runner(app):
 
 
 class AuthActions:
-    def __init__(self, client):
-        self._client = client
+    def __init__(self, client, monkeypatch):
+        self.client = client
+        self.monkeypatch = monkeypatch
+        self.username = 'test'
+        self.userid = 123
+        self.u_obj = User(name=self.username, id=self.userid)
+        self.encoded = jwt.encode(self.u_obj.to_dict(), 
+                                    'notsecret', algorithm="HS256")
+        self.myjwt = JWT(token = self.encoded)
 
     def login(self, username="test", password="test"):
-        return self._client.post(
-            "/auth/login", data={"username": username, "password": password}
-        )
+        def mock_login(a, b, **kwargs):
+            return self.myjwt.to_dict()
+
+        self.monkeypatch.setattr(UserApi, "login_user", mock_login)
+
+        with self.client:
+            response = self.client.post(
+                "/user/login", data={"username": self.username}
+            )
+            assert response.status_code == 302 or response.status_code == 303
+
+            # it is hard to write a test case to test this fixture to make
+            # sure that the token is returned.  So I'm doing it here.
+            assert 'jwt_token' in session 
+            assert session['jwt_token'] == self.myjwt.to_dict()
+
+        return response
 
     def logout(self):
-        return self._client.get("/auth/logout")
+        return self.client.get("/user/logout")
 
 
 @pytest.fixture
-def auth(client):
-    return AuthActions(client)
+def auth(client, monkeypatch):
+    return AuthActions(client, monkeypatch)
