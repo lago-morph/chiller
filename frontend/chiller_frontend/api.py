@@ -42,7 +42,7 @@ class ChillerSDK():
         on failure, result is False and message is descriptive error message
         """
         try:
-            self.u.create_user(body=User(name))
+            self.u.create_user(body=User(name=name))
         except ApiException as e:
             return False, e.body
     
@@ -72,9 +72,12 @@ class ChillerSDK():
         on failure, result is False and message is descriptive error message
         """
         try:
-            self.movies_api.add_movie(user_id, body=Movie(title))
+            print(f"adding movie {title} to user ID {user_id}")
+            self.m.add_movie(user_id, body=Movie(title))
         except ApiException as e:
+            print(f"add movie failed with message {e.body}")
             return False, e.body
     
+        print("add movie succeeded")
         return True, ''
     

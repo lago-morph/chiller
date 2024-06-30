@@ -64,7 +64,8 @@ def create():
         if success:
             return login_processing(rf[key])
 
-    flash(error)
+    if error is not None:
+        flash(error)
     return redirect(url_for("user.login"))
 
 

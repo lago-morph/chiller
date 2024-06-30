@@ -29,7 +29,8 @@ def list():
         movielist = []
         error = msg
 
-    flash(error)
+    if error is not None:
+        flash(error)
 
     return render_template("movies/list.html", movielist=movielist)
 
@@ -52,6 +53,7 @@ def add():
         if not success:
             error = msg
 
-    flash(error)
+    if error is not None:
+        flash(error)
 
     return redirect(url_for("movies.list"))

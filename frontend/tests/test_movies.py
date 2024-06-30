@@ -75,9 +75,17 @@ class TestMoviesAddSuccess():
   
         auth.login()
         with client:
-            r = client.post("/movies/add", data=Movie("test title").to_dict())
+            r = client.post("/movies/add", data={'title': "test title"})
             assert r.headers["Location"] == url_for('movies.list')
         assert r.status_code == 302 or r.status_code == 303
+
+        # get the rdirect location and ensure there is not a flash error
+        def return_movies(a, *args, **kwargs):
+            return []
+        monkeypatch.setattr(MoviesApi, "list_movies", return_movies)
+        r = client.get(r.headers["Location"])
+        pprint(r.data)
+        assert b"FLASH ERROR" not in r.data
 
 class TestMoviesAddError():
 
@@ -88,7 +96,7 @@ class TestMoviesAddError():
         {"title": ""}, 
         {"key": "value"} 
     ))
-    def test_add_missing_title(self, client, data, auth):
+    def test_add_missing_title(self, client, data, auth, monkeypatch):
         auth.login()
         with client:
             r = client.post("/movies/add", data=data)
@@ -99,6 +107,9 @@ class TestMoviesAddError():
 
         # now have to load the redirect to check the flash error message
         redirect = r.headers["Location"]
+        def return_movies(a, *args, **kwargs):
+            return []
+        monkeypatch.setattr(MoviesApi, "list_movies", return_movies)
         r2 = client.get(redirect)
         assert b"Movie title is required" in r2.data
 
