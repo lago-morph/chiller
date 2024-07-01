@@ -15,7 +15,7 @@
       </header>
     </article>
   {% endfor %}
-  <form action= url_for('movies.add') method="post">
+  <form action= {{ url_for('movies.add') }} method="post">
       <label for="title">Title</label>
       <input name="title" id="title"  required>
       <input type="submit" value="Add Movie">
