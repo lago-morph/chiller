@@ -57,7 +57,7 @@ class TestPOSTLoginSuccess():
         myjwt = JWT(token = encoded)
     
         def mock_call(a, *args, **kwargs):
-            return myjwt.to_dict()
+            return myjwt
         def do_nothing(a, *args, **kwargs):
             pass
     
@@ -100,7 +100,7 @@ class TestPOSTComplicatedCreateAndLoginError():
 
         if allow_create_first:
             def mock_login(*args, **kwargs):
-                return auth.myjwt.to_dict()
+                return auth.myjwt
             monkeypatch.setattr(UserApi, "create_user", mock_login)
 
     

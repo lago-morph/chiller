@@ -23,7 +23,7 @@ class TestMoviesListSuccess():
 
         l = []
         for t in range(num_movies):
-            l.append({'title': uuid.uuid4().hex})
+            l.append({'name': uuid.uuid4().hex})
         if num_movies > 2:
             l.append(l[0])
 
@@ -34,7 +34,7 @@ class TestMoviesListSuccess():
         r = client.get("/movies/list")
         assert r.status_code == 200
         for t in l:
-            assert t['title'].encode() in r.data
+            assert t['name'].encode() in r.data
         assert f"<!-- { len(l) } elements -->".encode() in r.data
 
 

@@ -46,7 +46,7 @@ class AuthActions:
 
     def login(self, username="test", password="test"):
         def mock_login(a, b, **kwargs):
-            return self.myjwt.to_dict()
+            return self.myjwt
 
         self.monkeypatch.setattr(UserApi, "login_user", mock_login)
 

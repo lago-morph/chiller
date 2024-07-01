@@ -79,7 +79,7 @@ def login_processing(username):
     jwt_token, msg = w.get_user_login(username)
     if jwt_token is not None:
         session.clear()
-        session["jwt_token"] = jwt_token
+        session["jwt_token"] = jwt_token.to_dict()
         return redirect(url_for("movies.list"))
     else:
         flash(msg)
