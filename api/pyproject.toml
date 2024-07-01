@@ -1,0 +1,13 @@
+[project]
+name = "chiller_api"
+version = "0.0.1"
+dependencies = [
+    "flask",
+    "flask_testing == 0.8.1",
+    "connexion >= 2.14, < 3.0",
+    "pyjwt >= 2.7",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
