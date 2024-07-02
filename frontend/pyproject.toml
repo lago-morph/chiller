@@ -6,7 +6,9 @@ readme = "README.rst"
 license = {text = "BSD-3-Clause"}
 maintainers = [{name = "Lagomorph Labs", email = "jonathan@manton.com"}]
 dependencies = [
-    "flask",
+    "flask >= 3.0",
+    "pyjwt >= 2.7",
+    "chiller_api_client",
 ]
 
 [project.optional-dependencies]
@@ -22,6 +24,7 @@ name = "chiller_frontend"
 [tool.flit.sdist]
 include = [
     "tests/",
+    "integration_tests/",
 ]
 
 [tool.pytest.ini_options]
@@ -31,6 +34,3 @@ filterwarnings = ["error"]
 [tool.coverage.run]
 branch = true
 source = ["chiller_frontend", "tests"]
-
-[tool.ruff]
-src = ["src"]
