@@ -4,8 +4,9 @@ version = "0.0.1"
 dependencies = [
     "flask",
     "flask_testing == 0.8.1",
-    "connexion >= 2.14, < 3.0",
+    "connexion[swagger-ui] >= 2.14, < 3.0",
     "pyjwt >= 2.7",
+    "six",
 ]
 
 [build-system]
