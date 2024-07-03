@@ -1,17 +1,30 @@
-import sqlite3
+import psycopg
 
 import click
 from flask import current_app, g
+import os
 
+
+def build_connstring():
+    user = current_app.config['CHILLER_DB_USER']
+    password = current_app.config['CHILLER_DB_PASSWORD']
+    host = current_app.config['CHILLER_DB_HOST']
+    port = current_app.config['CHILLER_DB_PORT']
+    return f"postgres://{user}:{password}@{host}:{port}"
+
+def create_db(db_name):
+    conn = psycopg.connect(build_connstring())
+    cursor = conn.cursor()
+    conn.autocommit = True
+    conn.execute(f"create database {db_name}")
+    cursor.close()
+    conn.close()
 
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect(current_app.config['DATABASE'],
-                               detect_types=sqlite3.PARSE_DECLTYPES)
-        g.db.row_factory = sqlite3.Row
-
-    g.db.execute('PRAGMA foreign_keys = ON')
-
+        cstr = build_connstring()
+        name = current_app.config['CHILLER_DB_NAME']
+        g.db = psycopg.connect(f"{cstr}/{name}")
     return g.db
 
 
@@ -22,10 +35,14 @@ def close_db(e=None):
         db.close()
 
 def init_db():
-    db = get_db()
+    conn = get_db()
+    cur = conn.cursor()
 
     with current_app.open_resource('db/schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+        cur.execute(f.read().decode('utf8'))
+        conn.commit()
+        cur.close()
+
 
 
 @click.command('init-db')

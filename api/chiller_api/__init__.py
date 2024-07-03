@@ -12,6 +12,26 @@ def create_app():
     conapp = initialize_application('./swagger/')
     return conapp.app
 
+class ConfigurationException(Exception):
+    """Raised when configuration is not complete"""
+
+def config_from_env(config, key, default):
+    # check if key is set.  If not, check for environment variable.
+    # If still not found, set as a default.
+    # If we get to the point where we are trying to set a default, and it
+    # is set to None, then that is a fatal error
+
+    d = { }
+    if key not in config:
+        if key in os.environ:
+            d[key] = os.environ[key]
+        elif default is not None:
+            d[key] = default
+        else:
+            raise ConfigurationException(
+                    f"environment variable {key} must be set")
+    return d
+
 
 def initialize_application(spec_dir, local_config=None):
 
@@ -22,18 +42,15 @@ def initialize_application(spec_dir, local_config=None):
     if local_config is not None:
         conapp.app.config.from_mapping(local_config)
 
-    if 'SECRET_KEY' not in conapp.app.config:
-        conapp.app.config['SECRET_KEY'] = 'dev'
-    if 'DATABASE' not in conapp.app.config:
-        database = os.path.join(conapp.app.instance_path, 
-                                        'chiller_api.sqlite')
-        conapp.app.config['DATABASE'] = database
+    c = {}
+    c.update(config_from_env(conapp.app.config, 'SECRET_KEY', 'dev'))
+    c.update(config_from_env(conapp.app.config, 'CHILLER_DB_NAME', 'chiller'))
+    c.update(config_from_env(conapp.app.config, "CHILLER_DB_HOST", "localhost"))
+    c.update(config_from_env(conapp.app.config, "CHILLER_DB_USER", "postgres"))
+    c.update(config_from_env(conapp.app.config, "CHILLER_DB_PASSWORD", None))
+    c.update(config_from_env(conapp.app.config, "CHILLER_DB_PORT", '5432'))
 
-    # make sure the instance folder exists
-        try:
-            os.makedirs(conapp.app.instance_path)
-        except OSError:
-            pass
+    conapp.app.config.from_mapping(c)
 
     db.init_app(conapp.app)
 

@@ -1,16 +1,12 @@
-PRAGMA foreign_keys = ON;
-
-DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS movielist;
-
-CREATE TABLE user (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT UNIQUE NOT NULL
+CREATE TABLE users 
+( 
+    id      serial primary key, 
+    name    TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE movielist (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  title TEXT NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES user (id)
+    id      serial primary key,
+    user_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
