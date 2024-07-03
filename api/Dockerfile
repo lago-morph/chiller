@@ -1,16 +1,14 @@
-FROM python:3.6-alpine
+FROM python:3.12
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY requirements.txt /usr/src/app/
+COPY ./dist/ /usr/src/app/dist/
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install chiller_api -f /usr/src/app/dist
 
-COPY . /usr/src/app
+RUN pip install gunicorn
 
 EXPOSE 8080
 
-ENTRYPOINT ["python3"]
-
-CMD ["-m", "chiller_api"]
+ENTRYPOINT gunicorn -w 4 --bind 0.0.0.0:8080 'chiller_api:create_app()'
