@@ -1,0 +1,16 @@
+FROM python:3.12
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY ./sdk/dist/ /usr/src/app/sdk/
+COPY ./frontend/dist/ /usr/src/app/frontend/
+
+RUN pip install chiller_api_client -f /usr/src/app/sdk
+RUN pip install chiller_frontend -f /usr/src/app/frontend
+
+RUN pip install gunicorn
+
+EXPOSE 80
+
+ENTRYPOINT gunicorn -w 4 --bind 0.0.0.0:80 'chiller_frontend:create_app()'

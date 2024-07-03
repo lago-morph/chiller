@@ -9,6 +9,6 @@ RUN pip install chiller_api -f /usr/src/app/dist
 
 RUN pip install gunicorn
 
-EXPOSE 8080
+EXPOSE 80
 
-ENTRYPOINT gunicorn -w 4 --bind 0.0.0.0:8080 'chiller_api:create_app()'
+ENTRYPOINT gunicorn -w 4 --bind 0.0.0.0:80 'chiller_api:create_app()'
