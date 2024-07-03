@@ -1,13 +1,13 @@
 [project]
 name = "chiller_api"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
     "flask",
     "flask_testing == 0.8.1",
     "connexion[swagger-ui] >= 2.14, < 3.0",
     "pyjwt >= 2.7",
     "six",
-    "psychopg >= 3.2",
+    "psycopg >= 3.2",
 ]
 
 [build-system]
