@@ -10,3 +10,9 @@ jobs:
   build-chiller-api-image:
     uses: ./.github/workflows/build_api_image.yml
     needs: unit-test-chiller-api
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
