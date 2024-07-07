@@ -4,6 +4,9 @@ on: workflow_dispatch
 jobs:
   build-packages:
     uses: ./.github/workflows/build_pkg.yml
+  unit-test-chiller-frontend:
+    uses: ./.github/workflows/api_test_frontend.yml
+    needs: build-packages
   unit-test-chiller-api:
     uses: ./.github/workflows/api_test_unit.yml
     needs: build-packages

@@ -1,12 +1,6 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Frontend test unit
 
-on: [workflow_dispatch]
-
-permissions:
-  contents: read
+on: workflow_call
 
 jobs:
   frontend-test-unit:
@@ -16,21 +10,22 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.12
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    - name: update pip and install buildtools
+
+    - name: download built packages
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+
+    - name: install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install build
-    - name: Build chiller_api_client package
-      run: python -m build sdk
-    - name: Build chiller_frontend package
-      run: python -m build frontend
-    - name: Install dependencies
-      run: |
         python -m pip install pytest
-        python -m pip install --find-links sdk/dist --find-links frontend/dist chiller_api_client chiller_frontend
+        python -m pip install -f sdk/dist chiller_api_client
+        python -m pip install -f frontend/dist chiller_frontend
+
     - name: Test with pytest
       run: |
         pytest frontend/tests
