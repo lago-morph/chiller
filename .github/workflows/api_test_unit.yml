@@ -1,0 +1,55 @@
+name: Unit test chiller_api
+on: [workflow_dispatch]
+
+jobs:
+  # Label of the runner job
+  runner-job:
+    runs-on: ubuntu-latest
+
+    # Service containers to run with `runner-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:16.3-alpine
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres_password
+          POSTGRES_DB: chiller
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: update pip and install buildtools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build chiller_api package
+        run: python -m build api
+
+      - name: Install dependencies
+        run: |
+          python -m pip install pytest
+          python -m pip install --find-links api/dist chiller_api
+
+      - name: Test with pytest
+        run: |
+          pytest api/chiller_api/test
+        env:
+          CHILLER_DB_PASSWORD: postgres_password
