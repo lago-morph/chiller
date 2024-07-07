@@ -41,8 +41,7 @@ jobs:
           # insert a user
           psql -c "insert into users (name) values ('bob')"
           # insert a movie
-          # psql -c "insert into movielist (user_id, title) values (1, 'this is a title')"
-          psql -c "insert into movielist (user_id, title) values (2, 'this is a title')"
+          psql -c "insert into movielist (user_id, title) values (1, 'this is a title')"
         env:
           PGHOST: localhost
           PGPASSWORD: postgres_password
