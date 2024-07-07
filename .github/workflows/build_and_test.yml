@@ -6,3 +6,7 @@ jobs:
     uses: ./.github/workflows/build_pkg.yml
   unit-test-chiller-api:
     uses: ./.github/workflows/api_test_unit.yml
+    needs: build-packages
+  build-chiller-api-image:
+    uses: ./.github/workflows/build_api_image.yml
+    needs: unit-test-chiller-api
