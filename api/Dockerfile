@@ -3,13 +3,20 @@
 FROM python:3.12
 
 RUN mkdir -p /usr/src/app
+
 WORKDIR /usr/src/app
+
+RUN pip install gunicorn
+
+RUN mkdir -p /usr/src/app/api
+
+COPY ./api/requirements.txt /usr/src/app/api
+
+RUN pip install -r /usr/src/app/api/requirements.txt
 
 COPY ./api/dist/ /usr/src/app/dist/
 
 RUN pip install chiller_api -f /usr/src/app/dist
-
-RUN pip install gunicorn
 
 EXPOSE 80
 

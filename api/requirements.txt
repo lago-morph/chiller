@@ -1,7 +1,6 @@
-connexion >= 2.6.0, < 3.0
-connexion[swagger-ui] >= 2.6.0
-python_dateutil == 2.6.0
-setuptools >= 21.0.0
-swagger-ui-bundle >= 0.0.2
+flask
+flask_testing == 0.8.1
+connexion[swagger-ui] >= 2.14, < 3.0
 pyjwt >= 2.7
-psychopg >= 3.2
+six
+psycopg >= 3.2
