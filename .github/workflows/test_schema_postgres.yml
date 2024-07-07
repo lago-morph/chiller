@@ -1,0 +1,48 @@
+name: Unit test schema.sql
+on: [workflow_dispatch]
+
+jobs:
+  # Label of the runner job
+  runner-job:
+    runs-on: ubuntu-latest
+
+    # Service containers to run with `runner-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:16.3-alpine
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres_password
+          POSTGRES_DB: chiller
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: apt install postgresql-client
+          
+      - name: Check schema validity
+        run: |
+          # create the chiller DB
+          psql -f chiller/api/chiller_api/db/schema.sql
+          # insert a user
+          psql -c "insert into users (name) values ('bob')"
+          # insert a movie
+          psql -c "insert into movielist (user_id, title) values (1, 'this is a title')"
+        env:
+          PGHOST: localhost
+          PGPASSWORD: postgres_password
+          PGUSER: postgres
+          PGDATABASE: chiller
