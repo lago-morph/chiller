@@ -31,10 +31,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: apt install postgresql-client
+        run: sudo apt install postgresql-client
           
       - name: Check schema validity
         run: |
+          echo ${{ github.sha }}
           # create the chiller DB
           psql -f chiller/api/chiller_api/db/schema.sql
           # insert a user
