@@ -19,18 +19,18 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.12"
-    - name: update pip
-      run: python -m pip install --upgrade pip
-    - name: Build chiller_api_client package
+    - name: update pip and install buildtools
       run: |
+        python -m pip install --upgrade pip
         python -m pip install build
-        python -m build sdk
+    - name: Build chiller_api_client package
+      run: python -m build sdk
+    - name: Build chiller_frontend package
+      run: python -m build frontend
     - name: Install dependencies
       run: |
         python -m pip install pytest
-        python -m pip install --find-links sdk/dist chiller_api_client
-        if [ -f frontend/requirements.txt ]; then pip install -r frontend/requirements.txt; fi
-        if [ -f frontend/test-requirements.txt ]; then pip install -r frontend/test-requirements.txt; fi
+        python -m pip install --find-links sdk/dist --find-links frontend/dist chiller_api_client chiller_frontend
     - name: Test with pytest
       run: |
         pytest frontend/tests
