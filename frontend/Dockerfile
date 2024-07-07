@@ -1,3 +1,6 @@
+# Note, the build MUST be executed from the root directory of the repository
+# in the local dev environment this is likely the directory ~/chiller.
+
 FROM python:3.12
 
 RUN mkdir -p /usr/src/app
