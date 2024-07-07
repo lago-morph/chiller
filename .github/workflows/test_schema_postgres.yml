@@ -37,7 +37,7 @@ jobs:
         run: |
           echo ${{ github.sha }}
           # create the chiller DB
-          psql -f chiller/api/chiller_api/db/schema.sql
+          psql -f api/chiller_api/db/schema.sql
           # insert a user
           psql -c "insert into users (name) values ('bob')"
           # insert a movie
