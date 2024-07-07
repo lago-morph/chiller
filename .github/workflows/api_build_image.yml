@@ -1,4 +1,4 @@
-name: Build and publish chiller_api image
+name: sub - Build/publish chiller_api image
 
 on:
     workflow_call

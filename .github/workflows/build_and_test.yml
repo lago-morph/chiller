@@ -1,9 +1,9 @@
-name: Build and Test
+name: main - Build and Test
 on: workflow_dispatch
 
 jobs:
   build-packages:
-    uses: ./.github/workflows/build_pkg.yml
+    uses: ./.github/workflows/pkg_build.yml
   unit-test-chiller-frontend:
     uses: ./.github/workflows/frontend_test_unit.yml
     needs: build-packages
@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/api_test_unit.yml
     needs: build-packages
   build-chiller-api-image:
-    uses: ./.github/workflows/build_api_image.yml
+    uses: ./.github/workflows/api_build_image.yml
     needs: unit-test-chiller-api
     permissions:
       contents: read
