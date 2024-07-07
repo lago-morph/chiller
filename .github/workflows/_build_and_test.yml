@@ -1,0 +1,8 @@
+name: Build and Test
+on: workflow_dispatch
+
+jobs:
+  build-packages:
+    uses: lago-morph/chiller/.github/workflows/build_pkg.yml
+  unit-test-chiller-api:
+    uses: lago-morph/chiller/.github/workflows/api_test_unit.yml
