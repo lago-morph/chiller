@@ -1,1 +1,0 @@
-docker run --rm --name chiller-api -e CHILLER_DB_PASSWORD=postgres -e CHILLER_DB_HOST=chiller-postgres --network chiller-net -p 8080:80 -d ghcr.io/lago-morph/chiller_api:sha-a2661e1c75569784373f48848b3b5e413b715f2f

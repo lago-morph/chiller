@@ -1,1 +1,0 @@
-docker run --rm --name chiller-frontend -e CHILLER_HOST=chiller-api --network chiller-net -p 8222:80 -d ghcr.io/lago-morph/chiller_frontend:sha-90be6406b65fb72ea5e8166cc2fdde8143e74152
