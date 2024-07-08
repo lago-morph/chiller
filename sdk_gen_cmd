@@ -1,7 +1,0 @@
-docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli-v3 generate \
-    -i /local/chiller_api.yaml \
-    -l python \
-    -o /local/sdk \
-    -DpackageName=chiller_api_client
-
-sudo chown -R jonathan ./sdk
