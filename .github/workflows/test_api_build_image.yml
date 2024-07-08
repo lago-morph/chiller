@@ -1,0 +1,14 @@
+name: test - test api build image
+on: workflow_dispatch
+
+jobs:
+  build-packages:
+    uses: ./.github/workflows/pkg_build.yml
+  build-chiller-api-image:
+    uses: ./.github/workflows/api_build_image.yml
+    needs: build-packages
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
