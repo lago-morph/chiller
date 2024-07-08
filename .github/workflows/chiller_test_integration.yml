@@ -7,12 +7,17 @@ on:
         default: ${{ github.sha }}
         required: false
         type: string
+      registry:
+        default: ghcr.io
+        required: false
+        type: string
+      namespace:
+        default: lago-morph
+        required: false
+        type: string
 
 env:
-  REGISTRY: ghcr.io
-  NAMESPACE: lago-morph
-  TAG: sha-${{ inputs.sha }}
-  API_IMAGE: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/chiller_api:sha-${{ github.sha }}
+  API_IMAGE: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_api:sha-${{ inputs.sha }}
   POSTGRES_PASSWORD: some_random_string
   CHILLER_DB: chiller
 
