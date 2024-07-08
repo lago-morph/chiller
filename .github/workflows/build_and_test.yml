@@ -26,3 +26,10 @@ jobs:
       packages: write
       attestations: write
       id-token: write
+  integration-test-chiller:
+    uses: ./.github/workflows/chiller_test_integration.yml
+    needs: [ build-chiller-api-image, unit-test-chiller-frontend ]
+  browser-test-chiller:
+    uses: ./.github/workflows/chiller_test_browser.yml
+    needs: [ integration-test-chiller, build-chiller-frontend-image ]
+
