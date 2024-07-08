@@ -17,12 +17,11 @@ on:
         type: string
 
 env:
-  API_IMAGE: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_api:sha-${{ inputs.sha }}
   POSTGRES_PASSWORD: some_random_string
   CHILLER_DB: chiller
 
 jobs:
-  api-test-int:
+  chiller-test-int:
     runs-on: ubuntu-latest
 
     services:
@@ -41,7 +40,7 @@ jobs:
           - 5432:5432
             
       chiller-api:
-        image: ${{ env.API_IMAGE }}
+        image: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_api:sha-${{ inputs.sha }}
         env:
           CHILLER_DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           CHILLER_DB_HOST: postgres
