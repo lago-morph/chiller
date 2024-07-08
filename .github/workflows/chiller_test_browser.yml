@@ -1,16 +1,32 @@
 name: sub - browser test chiller
-on: workflow_call
+on: 
+  workflow_call:
+    inputs:
+      sha-api:
+        description: 'SHA uesd to identify version of api image'
+        default: ${{ github.sha }}
+        required: false
+        type: string
+      sha-fe:
+        description: 'SHA uesd to identify version of frontend image'
+        default: ${{ github.sha }}
+        required: false
+        type: string
+      registry:
+        default: ghcr.io
+        required: false
+        type: string
+      namespace:
+        default: lago-morph
+        required: false
+        type: string
 
 env:
-  REGISTRY: ghcr.io
-  NAMESPACE: lago-morph
-  API_IMAGE: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/chiller_api:sha256-${{ github.sha }}
-  FRONTEND_IMAGE: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/chiller_frontend:sha256-${{ github.sha }}
-  POSTGRES_PASSWORD: some_other_pass
+  POSTGRES_PASSWORD: some_string_I_guess
   CHILLER_DB: chiller
 
 jobs:
-  api-test-int:
+  chiller-test-int:
     runs-on: ubuntu-latest
 
     services:
@@ -29,7 +45,7 @@ jobs:
           - 5432:5432
             
       chiller-api:
-        image: ${{ env.API_IMAGE }}
+        image: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_api:sha-${{ inputs.sha-api }}
         env:
           CHILLER_DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           CHILLER_DB_HOST: postgres
@@ -37,7 +53,7 @@ jobs:
           - 8080:80
             
       chiller-frontend:
-        image: ${{ env.FRONTEND_IMAGE }}
+        image: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_frontend:sha-${{ inputs.sha-fe }}
         env:
           CHILLER_HOST: chiller-api
         # note that browser test looks for frontend on localhost at port 8222
@@ -72,6 +88,6 @@ jobs:
       - name: Install Selenium
         run: sudo apt install python3-selenium
           
-      # note that browser test looks for frontend at port 8222
+      # note that browser test looks for frontend on localhost at port 8222
       - name: Test with pytest and selenium
         run: pytest frontend/browser_tests
