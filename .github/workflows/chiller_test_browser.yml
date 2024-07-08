@@ -85,8 +85,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest
 
-      - name: Install Selenium
+      - name: Install Selenium driver
         run: sudo apt install python3-selenium
+
+      # I am confused about why I also have to do this, but whatever
+      - name: Install python selenium package
+        run: python -m pip install selenium
           
       # note that browser test looks for frontend on localhost at port 8222
       - name: Test with pytest and selenium
