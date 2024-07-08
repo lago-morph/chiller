@@ -7,5 +7,5 @@ jobs:
   integration-test-chiller:
     uses: ./.github/workflows/chiller_test_integration.yml
     with:
-      sha: 90be6406b65fb72ea5e8166cc2fdde8143e74152
+      sha: a2661e1c75569784373f48848b3b5e413b715f2f
     needs: build-packages
