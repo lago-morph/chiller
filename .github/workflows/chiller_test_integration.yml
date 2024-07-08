@@ -1,0 +1,92 @@
+name: sub - Integration test chiller
+on: 
+  workflow_call:
+    inputs:
+      sha:
+        description: 'SHA uesd to identify version of image'
+        default: ${{ github.sha }}
+        required: false
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+  NAMESPACE: lago-morph
+  TAG: sha-${{ inputs.sha }}
+  API_IMAGE: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/chiller_api:sha-${{ github.sha }}
+  POSTGRES_PASSWORD: some_random_string
+  CHILLER_DB: chiller
+
+jobs:
+  api-test-int:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16.3-alpine
+        env:
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.CHILLER_DB }}
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+            
+      chiller-api:
+        image: ${{ env.API_IMAGE }}
+        env:
+          CHILLER_DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          CHILLER_DB_HOST: postgres
+        ports:
+          - 8080:80
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install psql
+        run: sudo apt install postgresql-client
+          
+      - name: Create DB tables
+        run: psql -f api/chiller_api/db/schema.sql
+        env:
+          PGHOST: localhost
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          PGUSER: postgres
+          PGDATABASE: ${{ env.CHILLER_DB }}
+
+      - name: download built packages
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: update pip and install pytest
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: install sdk and frontend
+        run: |
+          python -m pip install -f sdk/dist chiller_api_client
+          python -m pip install -f frontend/dist chiller_frontend
+
+      - name: Integration test chiler_api with sdk
+        run: |
+          pytest sdk/integration_test
+        env:
+          CHILLER_HOST: 127.0.0.1:8080
+
+      - name: Integration test chiler_api with frontend
+        run: |
+          pytest frontend/integration_tests
+        env:
+          CHILLER_HOST: 127.0.0.1:8080
+

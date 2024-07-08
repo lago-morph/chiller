@@ -1,0 +1,11 @@
+name: test - chiller test integration
+on: workflow_dispatch
+
+jobs:
+  build-packages:
+    uses: ./.github/workflows/pkg_build.yml
+  integration-test-chiller:
+    uses: ./.github/workflows/chiller_test_integration.yml
+    with:
+      sha: 90be6406b65fb72ea5e8166cc2fdde8143e74152
+    needs: build-packages
