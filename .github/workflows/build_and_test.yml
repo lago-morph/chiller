@@ -18,4 +18,11 @@ jobs:
       packages: write
       attestations: write
       id-token: write
-
+  build-chiller-frontend-image:
+    uses: ./.github/workflows/frontend_build_image.yml
+    needs: unit-test-chiller-frontend
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
