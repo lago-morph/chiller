@@ -1,0 +1,7 @@
+docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli-v3 generate \
+    -i /local/chiller_api.yaml \
+    -l python-flask \
+    -o /local/api \
+    -DpackageName=chiller_api
+
+sudo chown -R jonathan api

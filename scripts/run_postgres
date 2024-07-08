@@ -1,0 +1,1 @@
+docker run --rm --name chiller-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=chiller -d -p 5432:5432 --network chiller-net postgres:16.3-alpine
