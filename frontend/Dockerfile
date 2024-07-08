@@ -9,12 +9,6 @@ WORKDIR /usr/src/app
 RUN pip install --upgrade pip
 RUN pip install gunicorn
 
-COPY ./sdk/requirements.txt /usr/src/app/sdk-requirements.txt
-COPY ./frontend/requirements.txt /usr/src/app/frontend-requirements.txt
-
-RUN pip install -r /usr/src/app/sdk-requirements.txt
-RUN pip install -r /usr/src/app/frontend-requirements.txt
-
 COPY ./sdk/dist/ /usr/src/app/sdk/
 COPY ./frontend/dist/ /usr/src/app/frontend/
 
