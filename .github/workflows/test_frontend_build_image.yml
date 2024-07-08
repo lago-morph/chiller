@@ -1,0 +1,14 @@
+name: test - test frontend build image
+on: workflow_dispatch
+
+jobs:
+  build-packages:
+    uses: ./.github/workflows/pkg_build.yml
+  build-chiller-frontend-image:
+    uses: ./.github/workflows/frontend_build_image.yml
+    needs: build-packages
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
