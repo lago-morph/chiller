@@ -18,6 +18,7 @@ def add_and_check_movie(driver, moviename):
 def test_login_add_movie():
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
+    options.binary_location = '/usr/bin/chromium-browser'
     driver = webdriver.Chrome(options=options)
 
 # go to login page
