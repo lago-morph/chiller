@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: postgres
+    app: postgres
+  name: postgres
+spec:
+  volumes:
+  - name: schema
+    configMap:
+      name: schema
+  containers:
+  - image: postgres:16.3-alpine
+    name: postgres
+    ports:
+    - containerPort: 5432
+    volumeMounts:
+    - name: schema
+      mountPath: "/docker-entrypoint-initdb.d"
+      readOnly: true
+    env:
+    - name: POSTGRES_USER
+      valueFrom:
+        secretKeyRef:
+          name: db-auth
+          key: username
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: db-auth
+          key: password
+    - name: POSTGRES_DB
+      valueFrom:
+        secretKeyRef:
+          name: db-auth
+          key: database
+

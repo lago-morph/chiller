@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chiller-frontend
+  name: chiller-frontend
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: chiller-frontend

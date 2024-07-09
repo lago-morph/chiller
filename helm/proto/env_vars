@@ -1,0 +1,4 @@
+export PGUSER=postgres
+export PGPASSWORD=aMzk1MjgkdmRnN0pi
+export PGDATABASE=chiller
+

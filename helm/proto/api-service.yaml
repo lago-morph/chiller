@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chiller-api
+  name: chiller-api
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: chiller-api

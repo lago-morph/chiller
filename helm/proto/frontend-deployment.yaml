@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chiller-frontend
+  name: chiller-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chiller-frontend
+  template:
+    metadata:
+      labels:
+        app: chiller-frontend
+      name: chiller-frontend
+    spec:
+      containers:
+      - image: ghcr.io/lago-morph/chiller_frontend:sha-5136502a313fbd052763595fcfa37d16471c0d47
+        name: chiller-frontend
+        env:
+        - name: CHILLER_HOST
+          value: "chiller-api"

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chiller-api
+  name: chiller-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chiller-api
+  template:
+    metadata:
+      labels:
+        app: chiller-api
+      name: chiller-api
+    spec:
+      containers:
+      - image: ghcr.io/lago-morph/chiller_api:sha-5136502a313fbd052763595fcfa37d16471c0d47
+        name: chiller-api
+        ports:
+        - containerPort: 80
+        env:
+        - name: CHILLER_DB_HOST
+          value: "postgres"
+        - name: CHILLER_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-auth
+              key: username
+        - name: CHILLER_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-auth
+              key: password
+        - name: CHILLER_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: db-auth
+              key: database
