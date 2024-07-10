@@ -9,9 +9,9 @@ test-curl:
 port-forward:
 	kubectl port-forward service/chiller-frontend --address=192.168.88.130 8081:80
 
-delete-all: delete-api delete-frontend delete-postgres delete-cm delete-secret
+delete-all: delete-api delete-frontend delete-db delete-cm delete-secret
 
-create-all: create-frontend create-api create-postgres
+create-all: create-frontend create-api create-db
 
 create-secret:
 	kubectl apply -f db-auth-secret.yaml
@@ -19,9 +19,9 @@ create-secret:
 create-cm:
 	kubectl apply -f schema-cm.yaml
 
-create-postgres: create-cm create-secret
-	kubectl apply -f postgres-pod.yaml
-	kubectl apply -f postgres-service.yaml
+create-db: create-cm create-secret
+	kubectl apply -f db-pod.yaml
+	kubectl apply -f db-service.yaml
 
 create-api: create-secret
 	kubectl apply -f api-deployment.yaml
@@ -39,9 +39,9 @@ delete-frontend:
 	kubectl delete deployment chiller-frontend
 	kubectl delete service chiller-frontend
 
-delete-postgres:
-	kubectl delete pod postgres
-	kubectl delete service postgres
+delete-db:
+	kubectl delete pod db
+	kubectl delete service db
 
 delete-cm:
 	kubectl delete cm schema

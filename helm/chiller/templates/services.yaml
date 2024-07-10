@@ -1,0 +1,8 @@
+{{ range .Values.deployment -}}
+---
+{{ include "chiller.service" . }}
+...
+{{ end }}
+---
+{{ include "chiller.service" .Values.db }}
+...
