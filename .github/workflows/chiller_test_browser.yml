@@ -24,6 +24,7 @@ on:
 env:
   POSTGRES_PASSWORD: some_string_I_guess
   CHILLER_DB: chiller
+  FRONTEND_PORT: 8223
 
 jobs:
   chiller-test-int:
@@ -56,9 +57,8 @@ jobs:
         image: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_frontend:sha-${{ inputs.sha-fe }}
         env:
           CHILLER_HOST: chiller-api
-        # note that browser test looks for frontend on localhost at port 8222
         ports:
-          - 8222:80
+          - ${{ env.FRONTEND_PORT }}:80
 
     steps:
       - name: Check out repository code
@@ -94,4 +94,4 @@ jobs:
           
       # note that browser test looks for frontend on localhost at port 8222
       - name: Test with pytest and selenium
-        run: pytest frontend/browser_tests
+        run: CHILLER_HOST=127.0.0.1 CHILLER_PORT=${{ env.FRONTEND_PORT }} pytest frontend/browser_tests
