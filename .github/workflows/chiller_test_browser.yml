@@ -24,7 +24,6 @@ on:
 env:
   POSTGRES_PASSWORD: some_string_I_guess
   CHILLER_DB: chiller
-  FRONTEND_PORT: 8223
 
 jobs:
   chiller-test-int:
@@ -58,7 +57,7 @@ jobs:
         env:
           CHILLER_HOST: chiller-api
         ports:
-          - ${{ env.FRONTEND_PORT }}:80
+          - 8223:80
 
     steps:
       - name: Check out repository code
@@ -92,6 +91,5 @@ jobs:
       - name: Install python selenium package
         run: python -m pip install selenium
           
-      # note that browser test looks for frontend on localhost at port 8222
       - name: Test with pytest and selenium
-        run: CHILLER_HOST=127.0.0.1 CHILLER_PORT=${{ env.FRONTEND_PORT }} pytest frontend/browser_tests
+        run: CHILLER_HOST=127.0.0.1 CHILLER_PORT=8223 pytest frontend/browser_tests
