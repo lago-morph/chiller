@@ -56,9 +56,8 @@ jobs:
         image: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_frontend:sha-${{ inputs.sha-fe }}
         env:
           CHILLER_HOST: chiller-api
-        # note that browser test looks for frontend on localhost at port 8222
         ports:
-          - 8222:80
+          - 8223:80
 
     steps:
       - name: Check out repository code
@@ -92,6 +91,5 @@ jobs:
       - name: Install python selenium package
         run: python -m pip install selenium
           
-      # note that browser test looks for frontend on localhost at port 8222
       - name: Test with pytest and selenium
-        run: pytest frontend/browser_tests
+        run: CHILLER_HOST=127.0.0.1 CHILLER_PORT=8223 pytest frontend/browser_tests
