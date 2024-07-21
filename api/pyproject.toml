@@ -1,6 +1,6 @@
 [project]
 name = "chiller_api"
-version = "0.0.2"
+version = "0.1.0"
 dependencies = [
     "flask",
     "flask_testing == 0.8.1",
