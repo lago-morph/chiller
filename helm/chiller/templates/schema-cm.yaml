@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schema
+data:
+  schema.sql: "CREATE TABLE users \n( \n    id      serial primary key, \n    name
+    \   TEXT UNIQUE NOT NULL\n);\n\nCREATE TABLE movielist (\n    id      serial primary
+    key,\n    user_id INTEGER NOT NULL,\n    title TEXT NOT NULL,\n    FOREIGN KEY
+    (user_id) REFERENCES users (id)\n);\n"

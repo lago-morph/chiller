@@ -24,7 +24,7 @@ integration-tests: api-integration frontend-integration
 
 browser-test:
 	. ../run/chiller_browser/.venv/bin/activate
-	pytest frontend/browser_tests
+	CHILLER_HOST=$(LOCALHOST) CHILLER_PORT=$(CHILLER_FRONTEND_PORT) pytest frontend/browser_tests
 	deactivate
 
 api-integration:

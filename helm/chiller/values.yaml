@@ -1,0 +1,68 @@
+# Default values for chiller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+deployment:
+- name: chiller-api
+  replicaCount: 2
+  image:
+    repo: ghcr.io/lago-morph/
+    name: chiller_api
+    tag: ":sha-5136502a313fbd052763595fcfa37d16471c0d47"
+  ports:
+  - port: 80
+  env:
+  - env: CHILLER_DB_HOST
+    value: db
+  envSecret:
+  - secret: db-auth
+    env: CHILLER_DB_USER
+    key: username
+  - secret: db-auth
+    env: CHILLER_DB_PASSWORD
+    key: password
+  - secret: db-auth
+    env: CHILLER_DB_NAME
+    key: database
+- name: chiller-frontend
+  replicaCount: 2
+  image:
+    repo: ghcr.io/lago-morph/
+    name: chiller_frontend
+    tag: ":sha-5136502a313fbd052763595fcfa37d16471c0d47"
+  ports:
+  - port: 80
+  env:
+  - env: CHILLER_HOST
+    value: chiller-api
+
+db:
+  name: db
+  image:
+    repo: ""
+    name: postgres
+    tag: ":16.3-alpine"
+  ports:
+  - port: 5432
+  configMapVol:
+  - cmName: schema
+    filename: schema.sql
+    mountPath: /docker-entrypoint-initdb.d
+  envSecret:
+  - secret: db-auth
+    env: POSTGRES_USER
+    key: username
+  - secret: db-auth
+    env: POSTGRES_PASSWORD
+    key: password
+  - secret: db-auth
+    env: POSTGRES_DB
+    key: database
+
+dbSecret:
+  name: db-auth
+  username: postgres
+  database: chiller
+# expects username, database, and password keys.  
+# If a key is not specified here, its value is generated as random 24 
+# character alphanumeric string
