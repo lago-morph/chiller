@@ -1,8 +1,24 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import uuid
+import os
 
 
+class ConfigurationException(Exception):
+        """Raised when configuration is not complete"""
+
+def get_config(keys):
+
+    d = { }
+    for key in keys:
+        if key in os.environ:
+            d[key] = os.environ[key]
+        else:
+            raise ConfigurationException(
+                    f"environment variable {key} must be set")
+    return d
+
+    
 def add_and_check_movie(driver, moviename):
     num_movies = len(driver.find_elements(by=By.TAG_NAME, value="article"))
 
@@ -16,13 +32,14 @@ def add_and_check_movie(driver, moviename):
     assert moviename in movies[num_movies].text
 
 def test_login_add_movie():
+    cfg = get_config(["CHILLER_HOST", "CHILLER_PORT"])
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
     options.binary_location = '/usr/bin/chromium-browser'
     driver = webdriver.Chrome(options=options)
 
 # go to login page
-    driver.get("http://127.0.0.1:8222/user/login")
+    driver.get(f"http://{cfg["CHILLER_HOST"]}:{cfg["CHILLER_PORT"]}/user/login")
 
 # verify title of login page
     title = driver.title
@@ -31,11 +48,10 @@ def test_login_add_movie():
     driver.implicitly_wait(0.5)
 
 # create a user
-    userame = uuid.uuid4().hex
+    username = uuid.uuid4().hex
     text_box = driver.find_element(by=By.ID, value="username")
     submit_button = driver.find_element(by=By.ID, value="create")
 
-    username = uuid.uuid4().hex
     text_box.send_keys(username)
     submit_button.click()
 
