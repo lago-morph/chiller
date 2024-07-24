@@ -12,11 +12,11 @@ PGIMAGE := postgres:16.3-alpine
 
 .ONESHELL:
 
-# Note that there are no dependencies here because I'm lazy
+# dummy target does nothing when make without arguments
 target-required: 
 
 packages: api-package sdk-package frontend-package
-images: api-image frontend-image
+images: api-image frontend-image load-image
 
 all-tests: unit-tests integration-tests browser-test
 unit-tests: api-unit frontend-unit
@@ -57,6 +57,9 @@ frontend-image:
 api-image: 
 	docker build -f api/Dockerfile -t chiller_api .
 
+load-image: 
+	docker build -f load/Dockerfile -t chiller_load .
+
 api-package: 
 	python3 -m build api
 
@@ -78,6 +81,15 @@ start-postgres:
 stop-postgres:
 	docker stop chiller-postgres
 
+get-movies:
+	PGPASSWORD=$(PGPASSWORD) psql -U $(PGUSER) -d $(PGDATABASE) -h $(PGHOST) -c 'select * from movielist;'
+
+get-movies-num:
+	PGPASSWORD=$(PGPASSWORD) psql -U $(PGUSER) -d $(PGDATABASE) -h $(PGHOST) -c 'select count(*) from movielist;'
+
+get-users:
+	PGPASSWORD=$(PGPASSWORD) psql -U $(PGUSER) -d $(PGDATABASE) -h $(PGHOST) -c 'select * from users;'
+
 init-postgres:
 	PGPASSWORD=$(PGPASSWORD) psql -U $(PGUSER) -d $(PGDATABASE) -h $(PGHOST) -f api/chiller_api/db/schema.sql
 
@@ -86,6 +98,9 @@ start-api:
 
 stop-api:
 	docker stop chiller-api
+
+load-test:
+	docker run --rm --name chiller-load -e CHILLER_HOST=chiller-frontend -e CHILLER_PORT=80 --network $(DOCKER_NET) -d chiller_load
 
 start-frontend:
 	docker run --rm --name chiller-frontend -e CHILLER_HOST=chiller-api --network $(DOCKER_NET) -p $(CHILLER_FRONTEND_PORT):80 -d chiller_frontend
