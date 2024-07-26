@@ -2,8 +2,17 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# you can set apiImageOverride and frontendImageOverride to override the images
+# used for those two deployments
+
 deployment:
 - name: chiller-api
+  statsdExporter: True
+  configMapVol:
+  - cmName: statsd-conf
+    mountPath: /statsd
+  app: chiller
+  component: api
   replicaCount: 2
   image:
     repo: ghcr.io/lago-morph/
@@ -11,6 +20,7 @@ deployment:
     tag: ":sha-5136502a313fbd052763595fcfa37d16471c0d47"
   ports:
   - port: 80
+    name: http
   env:
   - env: CHILLER_DB_HOST
     value: db
@@ -25,6 +35,12 @@ deployment:
     env: CHILLER_DB_NAME
     key: database
 - name: chiller-frontend
+  statsdExporter: True
+  configMapVol:
+  - cmName: statsd-conf
+    mountPath: /statsd
+  app: chiller
+  component: frontend
   replicaCount: 2
   image:
     repo: ghcr.io/lago-morph/
@@ -32,9 +48,32 @@ deployment:
     tag: ":sha-5136502a313fbd052763595fcfa37d16471c0d47"
   ports:
   - port: 80
+    name: http
   env:
   - env: CHILLER_HOST
     value: chiller-api
+
+dbMonitor:
+  name: db-monitor
+  app: db
+  component: monitor
+  image:
+    repo: "quay.io/prometheuscommunity/"
+    name: postgres-exporter
+    tag: ""
+  ports:
+  - port: 9187
+    name: prometheus
+  env:
+  - env: DATA_SOURCE_URI
+    value: "db:5432/chiller?sslmode=disable"
+  envSecret:
+  - secret: db-auth
+    env: DATA_SOURCE_USER
+    key: username
+  - secret: db-auth
+    env: DATA_SOURCE_PASS
+    key: password
 
 db:
   name: db
@@ -46,7 +85,6 @@ db:
   - port: 5432
   configMapVol:
   - cmName: schema
-    filename: schema.sql
     mountPath: /docker-entrypoint-initdb.d
   envSecret:
   - secret: db-auth

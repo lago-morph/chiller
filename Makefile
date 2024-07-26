@@ -9,6 +9,9 @@ CHILLER_API_PORT := 8080
 CHILLER_FRONTEND_PORT := 8222
 DOCKER_NET := chiller-net
 PGIMAGE := postgres:16.3-alpine
+TTL_FRONTEND_NAME := $(shell uuidgen)
+TTL_API_NAME := $(shell uuidgen)
+TTL_LOAD_NAME := $(shell uuidgen)
 
 .ONESHELL:
 
@@ -51,11 +54,35 @@ frontend-unit:
 	pytest frontend/tests
 	deactivate
 
+frontend-image-ttl:
+	docker build -f frontend/Dockerfile -t ttl.sh/$(TTL_FRONTEND_NAME) .
+	docker push ttl.sh/$(TTL_FRONTEND_NAME)
+	echo
+	echo "frontend image name: $(TTL_FRONTEND_NAME)"
+	echo "- name: ghcr.io/lago-morph/chiller_frontend\n  newName: ttl.sh/$(TTL_FRONTEND_NAME)\n  newTag: latest" > /tmp/ttl_frontend_values.yaml
+	echo "helm override values file in /tmp/ttl_frontend_values.yaml"
+
 frontend-image:
 	docker build -f frontend/Dockerfile -t chiller_frontend .
 
+api-image-ttl:
+	docker build -f api/Dockerfile -t ttl.sh/$(TTL_API_NAME) .
+	docker push ttl.sh/$(TTL_API_NAME)
+	echo
+	echo "api image name: $(TTL_API_NAME)"
+	echo "- name: ghcr.io/lago-morph/chiller_api\n  newName: ttl.sh/$(TTL_API_NAME)\n  newTag: latest" > /tmp/ttl_api_values.yaml
+	echo "helm override values file in /tmp/ttl_api_values.yaml"
+
 api-image: 
 	docker build -f api/Dockerfile -t chiller_api .
+
+load-image-ttl:
+	docker build -f load/Dockerfile -t ttl.sh/$(TTL_LOAD_NAME) .
+	docker push ttl.sh/$(TTL_LOAD_NAME)
+	echo
+	echo "load image name: $(TTL_LOAD_NAME)"
+	echo "- name: ghcr.io/lago-morph/chiller_load\n  newName: ttl.sh/$(TTL_LOAD_NAME)\n  newTag: latest" > /tmp/ttl_load_values.yaml
+	echo "helm override values file in /tmp/ttl_load_values.yaml"
 
 load-image: 
 	docker build -f load/Dockerfile -t chiller_load .

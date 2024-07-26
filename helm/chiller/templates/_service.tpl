@@ -12,6 +12,13 @@ spec:
   ports:
     {{- range .ports }}
   - port: {{ .port }}
+      {{- if .name }}
+    name: {{ .name }}
+      {{- end }}
+    {{- end }}
+    {{- if .statsdExporter }}
+  - port: 9102
+    name: prometheus
     {{- end }}
   {{- end }}
 {{- end }}

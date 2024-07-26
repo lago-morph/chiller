@@ -15,9 +15,22 @@ spec:
         app: chiller-frontend
       name: chiller-frontend
     spec:
+      volumes:
+      - name: statsd-conf-volume
+        configMap:
+          name: statsd-conf
       containers:
-      - image: ghcr.io/lago-morph/chiller_frontend:sha-5136502a313fbd052763595fcfa37d16471c0d47
+      - image: ttl.sh/af2218b3-4508-4511-9635-b8ca5e622e59:latest
         name: chiller-frontend
         env:
         - name: CHILLER_HOST
           value: "chiller-api"
+      - name: statsd-exporter
+        image: prom/statsd-exporter
+        args:
+        - "-statsd.mapping-config=/statsd/statsd.conf"
+        ports:
+          containerPort: 9102
+        volumeMounts:
+        - name: config-volume
+          mountPath: /statsd

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: statsd-conf
+data:
+  statsd.conf: |
+    mappings:
+      - match: chiller.*.gunicorn.request.status.*
+        help: "chiller_${1}_http_response_code"
+        name: "chiller_${1}_http_response_code"
+        labels:
+          component: "$1"
+          status: "$2"
+          job: "chiller_${1}_gunicorn_response_code"

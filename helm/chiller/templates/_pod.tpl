@@ -49,5 +49,22 @@ spec:
           key: {{ .key }}
       {{- end }}
     {{- end }}
+  {{- if .statsdExporter }}
+  - name: statsd-exporter
+    image: prom/statsd-exporter
+    args:
+    - "--statsd.mapping-config=/statsd/statsd.conf"
+    ports:
+    - containerPort: 9102
+  
+    {{- if .configMapVol }}
+    volumeMounts:
+      {{- range .configMapVol }}
+    - name: {{ .cmName }}
+      mountPath: {{ .mountPath }}
+      readOnly: true
+      {{- end }}
+    {{- end }}
+  {{- end }}
 
 {{- end }}

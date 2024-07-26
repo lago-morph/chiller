@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chiller-load
+  name: chiller-load
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chiller-load
+  template:
+    metadata:
+      labels:
+        app: chiller-load
+      name: chiller-load
+    spec:
+      containers:
+      - image: ttl.sh/dd72a96f-f903-4270-8e76-e05eea2c4267
+        name: chiller-load
+        env:
+        - name: CHILLER_PORT
+          value: "80"
+        - name: CHILLER_HOST
+          value: "chiller-frontend"
