@@ -12,7 +12,7 @@ env:
   PR_ACTION: ${{ github.event.action }}
   PR_NUMBER: ${{ github.event.number }}
   PR_MERGED: ${{ github.event.pull_request.merged }}
-  TO_PROCESS: ${{ github.event_name == "pull_request" && github.event.pull_request.merged }}
+  TO_PROCESS: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
 
 jobs:
   test-job:
