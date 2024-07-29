@@ -5,7 +5,6 @@ on:
     branches:
       - 'test-release*'
     types: closed
-  push:
 
 # Kudos to https://stackoverflow.com/questions/59077079/how-to-get-pull-request-number-within-github-actions-workflow for info on how to do this.
 env:
@@ -13,6 +12,7 @@ env:
   PR_ACTION: ${{ github.event.action }}
   PR_NUMBER: ${{ github.event.number }}
   PR_MERGED: ${{ github.event.pull_request.merged }}
+  TO_PROCESS: ${{ github.event_name == pull_request && github.event.pull_request.merged }}
 
 jobs:
   test-job:
@@ -25,3 +25,18 @@ jobs:
           echo "pr number is: <$PR_NUMBER>"
           echo "pr action is: <$PR_ACTION>"
           echo "pr merged is: <$PR_MERGED>"
+  process-job:
+    if: $TO_PROCESS
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-result
+        name: we will process this
+        run: echo "this is to be processed"
+  skip-job:
+    if: ${{ ! $TO_PROCESS }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-result
+        name: we will skip this
+        run: echo "this is to be skipped"
+
