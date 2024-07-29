@@ -26,14 +26,16 @@ jobs:
           echo "pr action is: <$PR_ACTION>"
           echo "pr merged is: <$PR_MERGED>"
   process-job:
-    if: env.TO_PROCESS
+    # environment variables are not available in the jobs.if workflow key
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     steps:
       - id: print-result
         name: we will process this
         run: echo "this is to be processed"
   skip-job:
-    if: $TO_PROCESS == false
+    # environment variables are not available in the jobs.if workflow key
+    if: ${{ ! (github.event_name == 'pull_request' && github.event.pull_request.merged) }}
     runs-on: ubuntu-latest
     steps:
       - id: print-result
