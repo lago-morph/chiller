@@ -33,7 +33,7 @@ jobs:
         name: we will process this
         run: echo "this is to be processed"
   skip-job:
-    if: ${{ ! $TO_PROCESS }}
+    if: ${{ ! env.TO_PROCESS }}
     runs-on: ubuntu-latest
     steps:
       - id: print-result
