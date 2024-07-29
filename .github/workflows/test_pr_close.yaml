@@ -1,0 +1,26 @@
+name: test - detect if PR merged 
+on: 
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'test-release*'
+    types: closed
+
+# Kudos to https://stackoverflow.com/questions/59077079/how-to-get-pull-request-number-within-github-actions-workflow for info on how to do this.
+env:
+  GH_EVENT_NAME: ${{ github.event_name }}
+  PR_ACTION: ${{ github.event.action }}
+  PR_NUMBER: ${{ github.event.number }}
+  PR_MERGED: ${{ github.event.pull_request.merged }}
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-my-action
+        name: print out triggering action
+        run: |
+          echo "event name is: <$GH_EVENT_NAME>"
+          echo "pr number is: <$PR_NUMBER>"
+          echo "pr action is: <$PR_ACTION>"
+          echo "pr merged is: <$PR_MERGED>"
