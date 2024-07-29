@@ -26,7 +26,7 @@ jobs:
           echo "pr action is: <$PR_ACTION>"
           echo "pr merged is: <$PR_MERGED>"
   process-job:
-    if: $TO_PROCESS
+    if: env.TO_PROCESS
     runs-on: ubuntu-latest
     steps:
       - id: print-result
