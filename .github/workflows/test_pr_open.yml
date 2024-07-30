@@ -25,15 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-#      - name: Checkout repository to get hash
-#        uses: actions/checkout@v4
-      - name: Extract metadata (tags, labels)
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-#          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}
-          tags: type=sha,format=long
-#          labels: org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+      - id: set-temp-tag-name
+        name: Set the tag name used by the previous steps
+        run: echo "temptag=$(date --utc)" >> $GITHUB_ENV
       - id: print-output
         name: Debug print the tags
         run: echo ${{ steps.meta.outputs.tags }}
@@ -44,5 +38,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: ${{ steps.meta.outputs.tags }}
+              body: "tag used is: ${{ temptag }}"
             })
