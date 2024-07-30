@@ -25,6 +25,11 @@ jobs:
           echo "pr number is: <$PR_NUMBER>"
           echo "pr action is: <$PR_ACTION>"
           echo "pr merged is: <$PR_MERGED>"
+  test-pipe-job:
+    runs-on: ubuntu-latest
+    steps:
+      - id: test-pipe
+        run: /bin/bash -c 'echo bob | sed -e "s/ob/OB/"'
   test-pr-process-job:
     # environment variables are not available in the jobs.if workflow key
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
