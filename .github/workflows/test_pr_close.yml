@@ -38,8 +38,10 @@ jobs:
       - id: compute-tag-name
         name: Compute tag name for merge
         run: | 
-          BASEREF = ${{ github.event.pull_request.base.ref }}
-          DATE_TIME = $(date --utc +'%Y%m%d-%H%M%S')
+          BASEREF=${{ github.event.pull_request.base.ref }}
+          echo $BASEREF
+          DATE_TIME=$(date --utc +'%Y%m%d-%H%M%S')
+          echo $DATE_TIME
           echo "${{ github.event.pull_request.base.ref }}-RC-$(date --utc +'%Y%m%d-%H%M%S')"
           /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }}-RC-$(date --utc +"%Y%m%d-%H%M%S") | sed -e "s/^test-release-/v/"'
           /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }}-RC-$(date --utc +"%Y%m%d-%H%M%S") | sed -e "s/^test-release-/new_tag=v/" >> "$GITHUB_ENV"'
