@@ -24,6 +24,7 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    permissions: write-all
     steps:
       - id: set-temp-tag-name
         name: Set the tag name used by the previous steps
