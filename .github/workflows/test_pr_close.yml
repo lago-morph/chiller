@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - 'test-release*'
+      - 'test-release-*'
     types: closed
 
 # Kudos to https://stackoverflow.com/questions/59077079/how-to-get-pull-request-number-within-github-actions-workflow for info on how to do this.
@@ -30,15 +30,12 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     steps:
-      - id: print-result
-        name: we will process this
-        run: echo "this is to be processed"
-  skip-job:
-    # environment variables are not available in the jobs.if workflow key
-    if: ${{ ! (github.event_name == 'pull_request' && github.event.pull_request.merged) }}
-    runs-on: ubuntu-latest
-    steps:
-      - id: print-result
-        name: we will skip this
-        run: echo "this is to be skipped"
-
+      - id: compute-tag-name
+        name: Compute tag name for merge
+        run: | 
+          echo "${{ github.event.pull_request.base.ref }}-RC-$(date --utc +'%Y%m%d-%H%M%S')
+          echo "${{ github.event.pull_request.base.ref }}-RC-$(date --utc +'%Y%m%d-%H%M%S') | sed -e "s/^test-release-/v/"
+          echo "${{ github.event.pull_request.base.ref }}-RC-$(date --utc +'%Y%m%d-%H%M%S') | sed -e "s/^test-release-/new_tag=v/" >> "$GITHUB_ENV"
+      - id: show-tag-name
+        name: Show the tag name for the merge
+        run: echo "the tag to use is <$new_tag>"
