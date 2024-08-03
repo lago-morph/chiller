@@ -21,23 +21,34 @@ jobs:
           echo "event name is: <$GH_EVENT_NAME>"
           echo "pr number is: <$PR_NUMBER>"
           echo "pr action is: <$PR_ACTION>"
-  comment:
+  set-label:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     permissions: write-all
     steps:
-      - id: set-temp-tag-name
-        name: Set the tag name used by the previous steps
-        run: echo "temptag=$(date --utc)" >> $GITHUB_ENV
+      - id: set-tag-suffix
+        name: Set the tag suffix used by the subsequent steps
+        run: echo "tagsuffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+      - id: set-tag-prefix
+        name: set the prefix for the tag
+        run: /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/tagprefix=v/" >> "$GITHUB_ENV"'
+      - id: set-tag
+        run: echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_ENV
       - id: print-output
         name: Debug print the tags
-        run: echo "the tag is $temptag"
+        run: echo "the tag is ${{ env.tag }}"
       - uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.createComment({
+            github.rest.issues.setLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "tag used is: ${{ env.temptag }}"
+              labels: ["${{ env.tag }}"]
             })
+  test-job-env:
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-output
+        name: Debug print the tags
+        run: echo "the tag is ${{ env.tag }}"
