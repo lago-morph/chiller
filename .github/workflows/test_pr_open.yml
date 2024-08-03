@@ -31,15 +31,18 @@ jobs:
     steps:
       - id: set-tag-suffix
         name: Set the tag suffix used by the subsequent steps
-        run: echo "tagsuffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
-        run: echo "suffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+        run: |
+          echo "tagsuffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+          echo "suffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
       - id: set-tag-prefix
         name: set the prefix for the tag
-        run: /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/tagprefix=v/" >> "$GITHUB_ENV"'
-        run: /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/prefix=v/" >> $GITHUB_OUTPUT'
+        run: |
+          /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/tagprefix=v/" >> "$GITHUB_ENV"'
+          /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/prefix=v/" >> $GITHUB_OUTPUT'
       - id: set-tag
-        run: echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_ENV
-        run: echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_OUTPUT
+        run: |
+          echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_ENV
+          echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_OUTPUT
       - id: print-output
         name: Debug print the tags
         run: echo "the tag is ${{ env.tag }}"
@@ -59,6 +62,7 @@ jobs:
               labels: ["${{ needs.compute-label.outputs.tag }}"]
             })
   test-job-output:
+    needs: compute-label
     runs-on: ubuntu-latest
     steps:
       - id: print-output
