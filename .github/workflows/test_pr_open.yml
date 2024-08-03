@@ -21,22 +21,34 @@ jobs:
           echo "event name is: <$GH_EVENT_NAME>"
           echo "pr number is: <$PR_NUMBER>"
           echo "pr action is: <$PR_ACTION>"
-  set-label:
+  compute-label:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    permissions: write-all
+    outputs:
+      tagprefix: ${{ steps.set-tag-prefix.outputs.prefix }}
+      tagsuffix: ${{ steps.set-tag-suffix.outputs.suffix }}
+      tag: ${{ steps.set-tag.outputs.tag }}
     steps:
       - id: set-tag-suffix
         name: Set the tag suffix used by the subsequent steps
         run: echo "tagsuffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+        run: echo "suffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
       - id: set-tag-prefix
         name: set the prefix for the tag
         run: /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/tagprefix=v/" >> "$GITHUB_ENV"'
+        run: /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/prefix=v/" >> $GITHUB_OUTPUT'
       - id: set-tag
         run: echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_ENV
+        run: echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_OUTPUT
       - id: print-output
         name: Debug print the tags
         run: echo "the tag is ${{ env.tag }}"
+  set-label:
+    needs: compute-label
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions: write-all
+    steps:
       - uses: actions/github-script@v6
         with:
           script: |
@@ -44,11 +56,11 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: ["${{ env.tag }}"]
+              labels: ["${{ needs.compute-label.outputs.tag }}"]
             })
-  test-job-env:
+  test-job-output:
     runs-on: ubuntu-latest
     steps:
       - id: print-output
         name: Debug print the tags
-        run: echo "the tag is ${{ env.tag }}"
+        run: echo "the tag is ${{ needs.compute-label.outputs.tag }}"
