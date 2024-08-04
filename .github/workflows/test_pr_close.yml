@@ -39,11 +39,23 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo
-            }).data[0].name
+            }).data
+      - id: get-tag-name-2
+        name: get the tag name from the pull request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.listLabelsOnIssue({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            }).data
       - id: show-tag-name
         name: Show the tag name for the merge
         run: |
           echo "the tag to use is <$TAG>"
+          echo "the tag to use is <$TAG2>"
           echo "${{ steps.get-tag-name.outputs.result }}"
         env:
           TAG: ${{ steps.get-tag-name.outputs.result }}
+          TAG2: ${{ steps.get-tag-name-2.outputs.result }}
