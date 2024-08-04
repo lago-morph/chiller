@@ -29,6 +29,7 @@ jobs:
     # environment variables are not available in the jobs.if workflow key
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - id: get-tag-name
         name: get the tag name from the pull request
@@ -50,3 +51,13 @@ jobs:
       - id: show-tag-name-2
         run: |
           echo $tagname
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/$tagname',
+              sha: context.sha
+            })
