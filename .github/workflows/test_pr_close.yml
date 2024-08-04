@@ -44,4 +44,4 @@ jobs:
         name: Show the tag name for the merge
         run: echo "the tag to use is <$TAG>"
         env:
-          TAG=${{ steps.get-tag-name.outputs.result }}
+          TAG: ${{ steps.get-tag-name.outputs.result }}
