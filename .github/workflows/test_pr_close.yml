@@ -39,9 +39,11 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo
-            })[0]
+            })
       - id: show-tag-name
         name: Show the tag name for the merge
-        run: echo "the tag to use is <$TAG>"
+        run: |
+          echo "the tag to use is <$TAG>"
+          echo "${{ steps.get-tag-name.outputs.result }}"
         env:
           TAG: ${{ steps.get-tag-name.outputs.result }}
