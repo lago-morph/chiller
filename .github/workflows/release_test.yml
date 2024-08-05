@@ -9,6 +9,9 @@ jobs:
   get-recent-tag:
     runs-on: ubuntu-latest
     steps:
+      - id: checkout
+        name: Check out repository code
+        uses: actions/checkout@v4
       - id: get-tag
         name: Get the most recent tag in current branch
         run: |
