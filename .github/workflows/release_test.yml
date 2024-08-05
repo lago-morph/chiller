@@ -12,6 +12,8 @@ jobs:
       - id: checkout
         name: Check out repository code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - id: get-tag
         name: Get the most recent tag in current branch
         run: |
