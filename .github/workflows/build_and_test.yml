@@ -11,6 +11,19 @@ env:
   NAMESPACE: lago-morph
 
 jobs:
+  export-env:
+    runs-on: ubuntu-latest
+    outputs:
+      REGISTRY: ${{ steps.export.outputs.REGISTRY }}
+      NAMESPACE: ${{ steps.export.outputs.NAMESPACE }}
+    steps:
+      - id: export
+        name: stupid step to move data from env context to needs context
+        # THIS IS SO STUPID I HATE GITHUB ACTIONS
+        run: |
+          echo "REGISTRY=${{ env.REGISTRY }}" >> $GITHUB_OUTPUT
+          echo "NAMESPACE=${{ env.NAMESPACE }}" >> $GITHUB_OUTPUT
+
   compute-label:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
@@ -44,7 +57,7 @@ jobs:
 
   build-chiller-api-image:
     uses: ./.github/workflows/chiller_build_image.yml
-    needs: [ unit-test-chiller-api, compute-label ]
+    needs: [ unit-test-chiller-api, compute-label, export-env ]
     permissions:
       contents: read
       packages: write
@@ -52,14 +65,14 @@ jobs:
       id-token: write
     with:
       TAG: ${{ needs.compute-label.outputs.TAG }}
-      REGISTRY: ${{ env.REGISTRY }}
-      NAMESPACE: ${{ env.NAMESPACE }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
       IMAGE_NAME: chiller_api
       IMAGE_DIR: api
 
   build-chiller-frontend-image:
     uses: ./.github/workflows/chiller_build_image.yml
-    needs: [ unit-test-chiller-frontend, compute-label ]
+    needs: [ unit-test-chiller-frontend, compute-label, export-env ]
     permissions:
       contents: read
       packages: write
@@ -67,24 +80,24 @@ jobs:
       id-token: write
     with:
       TAG: ${{ needs.compute-label.outputs.TAG }}
-      REGISTRY: ${{ env.REGISTRY }}
-      NAMESPACE: ${{ env.NAMESPACE }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
       IMAGE_NAME: chiller_frontend
       IMAGE_DIR: frontend
   integration-test-chiller:
     uses: ./.github/workflows/chiller_test_integration.yml
-    needs: [ build-chiller-api-image, unit-test-chiller-frontend, compute-label ]
+    needs: [ build-chiller-api-image, unit-test-chiller-frontend, compute-label, export-env ]
     with:
       TAG: ${{ needs.compute-label.outputs.TAG }}
-      REGISTRY: ${{ env.REGISTRY }}
-      NAMESPACE: ${{ env.NAMESPACE }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
   browser-test-chiller:
     uses: ./.github/workflows/chiller_test_browser.yml
-    needs: [ integration-test-chiller, build-chiller-frontend-image, compute-label ]
+    needs: [ integration-test-chiller, build-chiller-frontend-image, compute-label, export-env ] 
     with:
       TAG: ${{ needs.compute-label.outputs.TAG }}
-      REGISTRY: ${{ env.REGISTRY }}
-      NAMESPACE: ${{ env.NAMESPACE }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
 
   set-label:
     needs: [compute-label, browser-test-chiller]
