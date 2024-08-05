@@ -5,10 +5,14 @@ jobs:
   build-packages:
     uses: ./.github/workflows/pkg_build.yml
   build-chiller-api-image:
-    uses: ./.github/workflows/api_build_image.yml
+    uses: ./.github/workflows/chiller_build_image.yml
     needs: build-packages
     permissions:
       contents: read
       packages: write
       attestations: write
       id-token: write
+    with:
+      TAG: v0.1.1-RC-20240805-201221
+      REGISTRY: ghcr.io
+      NAMESPACE: lago-morph
