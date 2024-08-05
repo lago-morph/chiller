@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - 'test-release*'
+      - 'xxtest-release*'
 
 # Kudos to https://stackoverflow.com/questions/59077079/how-to-get-pull-request-number-within-github-actions-workflow for info on how to do this.
 env:

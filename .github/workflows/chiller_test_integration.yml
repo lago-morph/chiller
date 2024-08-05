@@ -1,20 +1,19 @@
 name: sub - Integration test chiller
 on: 
-  workflow_call:
-    inputs:
-      sha:
-        description: 'SHA uesd to identify version of image'
-        default: ${{ github.sha }}
-        required: false
-        type: string
-      registry:
-        default: ghcr.io
-        required: false
-        type: string
-      namespace:
-        default: lago-morph
-        required: false
-        type: string
+    workflow_call:
+      inputs:
+        TAG:
+          description: 'tag used to identify version of built images'
+          required: true
+          type: string
+        REGISTRY:
+          description: 'registry used to house images'
+          required: true
+          type: string
+        NAMESPACE:
+          description: 'namespace of image in registry'
+          required: true
+          type: string
 
 env:
   POSTGRES_PASSWORD: some_random_string
@@ -30,7 +29,6 @@ jobs:
         env:
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ env.CHILLER_DB }}
-        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -40,7 +38,7 @@ jobs:
           - 5432:5432
             
       chiller-api:
-        image: ${{ inputs.registry }}/${{ inputs.namespace }}/chiller_api:sha-${{ inputs.sha }}
+        image: ${{ inputs.REGISTRY }}/${{ inputs.NAMESPACE }}/chiller_api:${{ inputs.TAG }}
         env:
           CHILLER_DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           CHILLER_DB_HOST: postgres

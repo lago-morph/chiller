@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - 'test-release-*'
+      - 'release-*'
     types: closed
 
 # Kudos to https://stackoverflow.com/questions/59077079/how-to-get-pull-request-number-within-github-actions-workflow for info on how to do this.
