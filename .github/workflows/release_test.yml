@@ -1,7 +1,9 @@
 name: release - run release test
 on: 
-  workflow_dispatch:
-  gollum:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - 'release-0.1.1'
 
 jobs:
   get-recent-tag:
