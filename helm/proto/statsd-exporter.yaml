@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: statsd-exporter
+  name: statsd-exporter
+spec:
+  volumes:
+  - name: statsd-conf-volume
+    configMap:
+      name: statsd-conf
+  containers:
+  - name: statsd-exporter
+    image: prom/statsd-exporter
+    args: ["--statsd.mapping-config=/statsd/statsd.conf"]
+    ports:
+    - containerPort: 9102
+    volumeMounts:
+    - name: statsd-conf-volume
+      mountPath: /statsd

@@ -16,4 +16,4 @@ RUN pip install chiller_api -f /usr/src/app/dist
 
 EXPOSE 80
 
-ENTRYPOINT gunicorn -w 4 --bind 0.0.0.0:80 'chiller_api:create_app()'
+ENTRYPOINT gunicorn --statsd-host=localhost:9125 --statsd-prefix=chiller.api -w 4 --bind 0.0.0.0:80 'chiller_api:create_app()'

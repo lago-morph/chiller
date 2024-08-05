@@ -17,4 +17,4 @@ RUN pip install chiller_frontend -f /usr/src/app/frontend
 
 EXPOSE 80
 
-ENTRYPOINT gunicorn -w 4 --bind 0.0.0.0:80 'chiller_frontend:create_app()'
+ENTRYPOINT gunicorn --statsd-host=localhost:9125 --statsd-prefix=chiller.frontend -w 4 --bind 0.0.0.0:80 'chiller_frontend:create_app()'

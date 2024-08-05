@@ -1,13 +1,51 @@
-name: main - Build and Test
+name: release - Build and Test
 on: 
   workflow_dispatch:
   pull_request:
     branches:
-      - main
-      - 'release*'
+      - 'release-*'
+      - 'test-release-*'
 
+env:
+  REGISTRY: ghcr.io
+  NAMESPACE: lago-morph
 
 jobs:
+  export-env:
+    runs-on: ubuntu-latest
+    outputs:
+      REGISTRY: ${{ steps.export.outputs.REGISTRY }}
+      NAMESPACE: ${{ steps.export.outputs.NAMESPACE }}
+    steps:
+      - id: export
+        name: stupid step to move data from env context to needs context
+        # THIS IS SO STUPID I HATE GITHUB ACTIONS
+        run: |
+          echo "REGISTRY=${{ env.REGISTRY }}" >> $GITHUB_OUTPUT
+          echo "NAMESPACE=${{ env.NAMESPACE }}" >> $GITHUB_OUTPUT
+
+  compute-label:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    outputs:
+      TAG: ${{ steps.set-tag.outputs.TAG }}
+    steps:
+      - id: set-tag-ix
+        name: Set the tag prefix and suffix used by the subsequent steps
+        run: |
+          echo "tagsuffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+          /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^.*release-/tagprefix=v/" >> "$GITHUB_ENV"'
+      - id: set-tag
+        run: |
+          echo "TAG=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_OUTPUT
+  test-job-output:
+    needs: compute-label
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-output
+        name: Debug print the tags
+        run: echo "the tag is ${{ needs.compute-label.outputs.TAG }}"
+
   build-packages:
     uses: ./.github/workflows/pkg_build.yml
   unit-test-chiller-frontend:
@@ -16,26 +54,64 @@ jobs:
   unit-test-chiller-api:
     uses: ./.github/workflows/api_test_unit.yml
     needs: build-packages
+
   build-chiller-api-image:
-    uses: ./.github/workflows/api_build_image.yml
-    needs: unit-test-chiller-api
+    uses: ./.github/workflows/chiller_build_image.yml
+    needs: [ unit-test-chiller-api, compute-label, export-env ]
     permissions:
       contents: read
       packages: write
       attestations: write
       id-token: write
+    with:
+      TAG: ${{ needs.compute-label.outputs.TAG }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
+      IMAGE_NAME: chiller_api
+      IMAGE_DIR: api
+
   build-chiller-frontend-image:
-    uses: ./.github/workflows/frontend_build_image.yml
-    needs: unit-test-chiller-frontend
+    uses: ./.github/workflows/chiller_build_image.yml
+    needs: [ unit-test-chiller-frontend, compute-label, export-env ]
     permissions:
       contents: read
       packages: write
       attestations: write
       id-token: write
+    with:
+      TAG: ${{ needs.compute-label.outputs.TAG }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
+      IMAGE_NAME: chiller_frontend
+      IMAGE_DIR: frontend
   integration-test-chiller:
     uses: ./.github/workflows/chiller_test_integration.yml
-    needs: [ build-chiller-api-image, unit-test-chiller-frontend ]
+    needs: [ build-chiller-api-image, unit-test-chiller-frontend, compute-label, export-env ]
+    with:
+      TAG: ${{ needs.compute-label.outputs.TAG }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
   browser-test-chiller:
     uses: ./.github/workflows/chiller_test_browser.yml
-    needs: [ integration-test-chiller, build-chiller-frontend-image ]
+    needs: [ integration-test-chiller, build-chiller-frontend-image, compute-label, export-env ] 
+    with:
+      TAG: ${{ needs.compute-label.outputs.TAG }}
+      REGISTRY: ${{ needs.export-env.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.export-env.outputs.NAMESPACE }}
+
+  set-label:
+    needs: [compute-label, browser-test-chiller]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions: write-all
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.setLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ["${{ needs.compute-label.outputs.TAG }}"]
+            })
 

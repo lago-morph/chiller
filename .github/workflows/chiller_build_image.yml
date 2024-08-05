@@ -1,0 +1,67 @@
+name: sub - Build/publish chiller image
+
+on:
+    workflow_call:
+      inputs:
+        TAG:
+          description: 'tag used to identify version of built images'
+          required: true
+          type: string
+        REGISTRY:
+          description: 'registry used to house images'
+          required: true
+          type: string
+        NAMESPACE:
+          description: 'namespace of image in registry'
+          required: true
+          type: string
+        IMAGE_NAME:
+          description: 'base name for image'
+          required: true
+          type: string
+        IMAGE_DIR:
+          description: 'subdirectory of image source'
+          required: true
+          type: string
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: download built packages
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ inputs.IMAGE_DIR }}/Dockerfile
+          push: true
+          tags: ${{ inputs.REGISTRY }}/${{ inputs.NAMESPACE }}/${{ inputs.IMAGE_NAME }}:${{ inputs.TAG }}
+          labels: org.opencontainers.image.title=${{ inputs.IMAGE_NAME }}
+      
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ inputs.REGISTRY }}/${{ inputs.NAMESPACE }}/${{ inputs.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

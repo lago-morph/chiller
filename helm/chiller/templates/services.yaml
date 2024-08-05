@@ -6,3 +6,6 @@
 ---
 {{ include "chiller.service" .Values.db }}
 ...
+---
+{{ include "chiller.service" .Values.dbMonitor }}
+...

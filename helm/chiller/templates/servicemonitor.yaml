@@ -1,0 +1,12 @@
+{{ if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" -}}
+{{ range .Values.deployment }}
+  {{- if .statsdExporter }}
+---
+{{ include "servicemonitor.crd" . }}
+...
+  {{- end }}
+{{ end }}
+---
+{{ include "servicemonitor.crd" .Values.dbMonitor }}
+...
+{{ end -}}

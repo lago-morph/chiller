@@ -1,2 +1,4 @@
 # swp files
 *.swp
+
+__pycache__/

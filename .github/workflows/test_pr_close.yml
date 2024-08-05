@@ -1,0 +1,64 @@
+name: test - detect if PR merged 
+on: 
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'test-release-*'
+      - 'release-*'
+    types: closed
+
+# Kudos to https://stackoverflow.com/questions/59077079/how-to-get-pull-request-number-within-github-actions-workflow for info on how to do this.
+env:
+  GH_EVENT_NAME: ${{ github.event_name }}
+  PR_ACTION: ${{ github.event.action }}
+  PR_NUMBER: ${{ github.event.number }}
+  PR_MERGED: ${{ github.event.pull_request.merged }}
+  TO_PROCESS: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
+
+jobs:
+  test-pr-merge-show:
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-my-action
+        name: print out triggering action
+        run: |
+          echo "event name is: <$GH_EVENT_NAME>"
+          echo "pr number is: <$PR_NUMBER>"
+          echo "pr action is: <$PR_ACTION>"
+          echo "pr merged is: <$PR_MERGED>"
+  test-pr-process-job:
+    # environment variables are not available in the jobs.if workflow key
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - id: get-tag-name
+        name: get the tag name from the pull request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            return github.rest.issues.listLabelsOnIssue({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            })
+      - id: show-tag-name
+        name: Show the tag name for the merge
+        run: |
+          echo "TAG is <$TAG>"
+          /bin/bash -c 'echo $TAG | jq ".data[0].name" | sed -e "s/\"//g" | sed -e "s/^/tagname=/" >> $GITHUB_ENV'
+        env:
+          TAG: ${{ steps.get-tag-name.outputs.result }}
+      - id: show-tag-name-2
+        run: |
+          echo $tagname
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ env.tagname }}',
+              sha: context.sha
+            })

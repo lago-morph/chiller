@@ -1,0 +1,105 @@
+name: test - detect PR number and add comment
+on: 
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'xxtest-release*'
+
+# Kudos to https://stackoverflow.com/questions/59077079/how-to-get-pull-request-number-within-github-actions-workflow for info on how to do this.
+env:
+  GH_EVENT_NAME: ${{ github.event_name }}
+  PR_NUMBER: ${{ github.event.number }}
+  PR_ACTION: ${{ github.event.action }}
+  REGISTRY: ghcr.io
+  NAMESPACE: lago-morph
+  IMAGE_NAME: hello
+      
+jobs:
+  test-pr-open:
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-my-action
+        name: print out triggering action
+        run: |
+          echo "event name is: <$GH_EVENT_NAME>"
+          echo "pr number is: <$PR_NUMBER>"
+          echo "pr action is: <$PR_ACTION>"
+  compute-label:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    outputs:
+      tagprefix: ${{ steps.set-tag-prefix.outputs.prefix }}
+      tagsuffix: ${{ steps.set-tag-suffix.outputs.suffix }}
+      tag: ${{ steps.set-tag.outputs.tag }}
+    steps:
+      - id: set-tag-suffix
+        name: Set the tag suffix used by the subsequent steps
+        run: |
+          echo "tagsuffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+          echo "suffix=$(date --utc +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+      - id: set-tag-prefix
+        name: set the prefix for the tag
+        run: |
+          /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/tagprefix=v/" >> "$GITHUB_ENV"'
+          /bin/bash -c 'echo ${{ github.event.pull_request.base.ref }} | sed -e "s/^test-release-/prefix=v/" >> $GITHUB_OUTPUT'
+      - id: set-tag
+        run: |
+          echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_ENV
+          echo "tag=${{ env.tagprefix }}-RC-${{ env.tagsuffix }}" >> $GITHUB_OUTPUT
+      - id: print-output
+        name: Debug print the tags
+        run: echo "the tag is ${{ env.tag }}"
+  set-label:
+    needs: compute-label
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions: write-all
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.setLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ["${{ needs.compute-label.outputs.tag }}"]
+            })
+  test-job-output:
+    needs: compute-label
+    runs-on: ubuntu-latest
+    steps:
+      - id: print-output
+        name: Debug print the tags
+        run: echo "the tag is ${{ needs.compute-label.outputs.tag }}"
+  build-and-push-image:
+    needs: compute-label
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: .github/workflows/docker/hello/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ needs.compute-label.outputs.tag }}
+          labels: org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
