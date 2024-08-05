@@ -1,0 +1,13 @@
+name: release - run release test
+on: 
+  workflow_dispatch:
+  gollum:
+
+jobs:
+  get-recent-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - id: get-tag
+        name: Get the most recent tag in current branch
+        run: |
+          /bin/bash -c "git tag --sort=taggerdate --merged"

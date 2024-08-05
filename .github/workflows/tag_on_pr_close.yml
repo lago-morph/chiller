@@ -1,4 +1,4 @@
-name: test - detect if PR merged 
+name: release - detect if PR merged 
 on: 
   workflow_dispatch:
   pull_request:
