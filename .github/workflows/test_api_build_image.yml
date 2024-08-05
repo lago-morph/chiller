@@ -13,6 +13,8 @@ jobs:
       attestations: write
       id-token: write
     with:
-      TAG: v0.1.1-RC-20240805-201221
+      TAG: v0.0.0-RC-20240805-201221
       REGISTRY: ghcr.io
       NAMESPACE: lago-morph
+      IMAGE_NAME: chiller_api
+      IMAGE_DIR: api
