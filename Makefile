@@ -1,3 +1,25 @@
+define DOCS
+Convenience helpers for Watch and Chill development
+
+To get running at http://localhost:8222
+make packages
+make images
+make docker-net
+make start-all
+(wait a few seconds then) make init-postgres
+
+Python packaging: packages api-package sdk-package frontend-package
+Docker images:    images api-image frontend-image load-image (+same with -ttl)
+Testing:          all-tests unit-tests integration-tests browser-test load-test
+Unit and int.:    api-unit frontend-unit api-integration frontend-integration
+Docker:           docker-net start-all stop-all
+Docker cont.:     start/stop - postgres/api/frontend (e.g., start-api)
+DB test:          get-movies get-movies-num get-users 
+DB:               init-postgres
+
+Note - create .venvs to run unit, integration, and browser tests - see Wiki
+endef
+
 MAKEFLAGS += --jobs
 
 PGUSER := postgres
@@ -16,10 +38,13 @@ TTL_LOAD_NAME := $(shell uuidgen)
 .ONESHELL:
 
 # dummy target does nothing when make without arguments
-target-required: 
+export DOCS
+show-usage: 
+	@echo "$$DOCS"
 
 packages: api-package sdk-package frontend-package
 images: api-image frontend-image load-image
+images-ttl: api-image-ttl frontend-image-ttl load-image-ttl
 
 all-tests: unit-tests integration-tests browser-test
 unit-tests: api-unit frontend-unit
