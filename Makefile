@@ -14,7 +14,7 @@ Testing:          all-tests unit-tests integration-tests browser-test load-test
 Unit and int.:    api-unit frontend-unit api-integration frontend-integration
 Docker:           docker-net start-all stop-all
 Docker cont.:     start/stop - postgres/api/frontend (e.g., start-api)
-DB test:          get-movies get-movies-num get-users 
+DB test:          get-movies get-movies-num get-users get-users-num
 DB:               init-postgres
 
 Note - create .venvs to run unit, integration, and browser tests - see Wiki
@@ -141,6 +141,9 @@ get-movies-num:
 
 get-users:
 	PGPASSWORD=$(PGPASSWORD) psql -U $(PGUSER) -d $(PGDATABASE) -h $(PGHOST) -c 'select * from users;'
+
+get-users-num:
+	PGPASSWORD=$(PGPASSWORD) psql -U $(PGUSER) -d $(PGDATABASE) -h $(PGHOST) -c 'select count(*) from users;'
 
 init-postgres:
 	PGPASSWORD=$(PGPASSWORD) psql -U $(PGUSER) -d $(PGDATABASE) -h $(PGHOST) -f api/chiller_api/db/schema.sql
