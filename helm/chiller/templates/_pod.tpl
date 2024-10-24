@@ -50,7 +50,9 @@ spec:
       {{- end }}
     {{- end }}
   {{- if .statsdExporter }}
+  initContainers:
   - name: statsd-exporter
+    restartPolicy: Always
     image: prom/statsd-exporter
     args:
     - "--statsd.mapping-config=/statsd/statsd.conf"
