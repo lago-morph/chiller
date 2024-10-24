@@ -4,6 +4,8 @@ Run locust load test
 Short run with debugging:       debug
 Load test 1 user:               load-1
 Load test 10 users:             load-10
+
+Make sure port 8222 is forwarded
 endef
 
 LOCALHOST := 127.0.0.1
