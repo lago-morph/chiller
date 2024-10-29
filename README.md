@@ -4,4 +4,4 @@ Jonathan is a system administrator making a transition to cloud-native applicati
 
 Together we will build a small application that allows our friends and family to list the movies they are interested in watching, with the goal of finding others in the group that may want to watch them together.  Along the way we will apply principles of CI/CD, IaC, and GitOps to build a modern web-based application.
 
-See the [repository Wiki](https://github.com/lago-morph/chiller/wiki) for significantly more detail.
+See the [documentation repository](https://github.com/lago-morph/chiller-doc) for more detail.
