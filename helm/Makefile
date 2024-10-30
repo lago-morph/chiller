@@ -29,7 +29,7 @@ endef
 
 MAKEFLAGS += --jobs
 
-CICD_TAG := $(shell git describe --tags)
+CICD_TAG := $(shell git describe --tags --abbrev=0)
 
 .ONESHELL:
 
