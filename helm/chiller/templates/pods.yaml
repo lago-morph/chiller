@@ -1,10 +1,10 @@
 ---
 apiVersion: v1
 kind: Pod
-{{ include "chiller.pod" .Values.db }}
+{{ include "chiller.pod" (list .Values.db .Values.appTag) }}
 ...
 ---
 apiVersion: v1
 kind: Pod
-{{ include "chiller.pod" .Values.dbMonitor }}
+{{ include "chiller.pod" (list .Values.dbMonitor .Values.appTag) }}
 ...

@@ -4,6 +4,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     name: {{ .app }}-{{ .component }}
+    release: prom-stack
   name: {{ .app }}-{{ .component }}
 spec:
   endpoints:

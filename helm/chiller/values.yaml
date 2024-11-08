@@ -2,8 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# you can set apiImageOverride and frontendImageOverride to override the images
-# used for those two deployments
+# appTag is the tag used for the application pods.
+
+appTag: "mustOverride"
 
 deployment:
 - name: chiller-api
@@ -17,7 +18,7 @@ deployment:
   image:
     repo: ghcr.io/lago-morph/
     name: chiller_api
-    tag: ":sha-5136502a313fbd052763595fcfa37d16471c0d47"
+    useAppTag: true
   ports:
   - port: 80
     name: http
@@ -45,7 +46,7 @@ deployment:
   image:
     repo: ghcr.io/lago-morph/
     name: chiller_frontend
-    tag: ":sha-5136502a313fbd052763595fcfa37d16471c0d47"
+    useAppTag: true
   ports:
   - port: 80
     name: http
@@ -61,6 +62,7 @@ dbMonitor:
     repo: "quay.io/prometheuscommunity/"
     name: postgres-exporter
     tag: ""
+    useAppTag: false
   ports:
   - port: 9187
     name: prometheus
@@ -80,7 +82,8 @@ db:
   image:
     repo: ""
     name: postgres
-    tag: ":16.3-alpine"
+    tag: "16.3-alpine"
+    useAppTag: false
   ports:
   - port: 5432
   configMapVol:

@@ -1,4 +1,7 @@
 {{ define "chiller.pod" -}}
+{{ $context := index . 0 -}}
+{{ $appTag := index . 1 -}}
+{{ with $context }}
 metadata:
   labels:
     app: {{ .name }}
@@ -14,7 +17,8 @@ spec:
   {{- end }}
   containers:
     {{- with .image }}
-  - image: {{ .repo }}{{ .name }}{{ .tag }}
+      {{- $tag := ( .useAppTag | ternary $appTag .tag) }}
+  - image: {{ .repo }}{{ .name }}{{ empty $tag | ternary "" ":"}}{{ $tag }}
     {{- end }}
     name: {{ .name }}
 
@@ -69,4 +73,5 @@ spec:
     {{- end }}
   {{- end }}
 
+{{- end }}
 {{- end }}

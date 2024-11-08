@@ -4,13 +4,16 @@ Convenience helpers for Watch and Chill deployment
 cicd           Installs with CI/CD images for current checked out branch
 ttl            Installs with ttl.io images with files in /tmp
 
-uninstall      Uninstalls helm chart
+uninstall-chiller      Uninstalls chiller
 
 
 port-prom      Port forwarding for Prometheus
 port-graf      Port forwarding for Grafana
 port-load      Port forwarding for load testing
 port-app       Port forwarding for accessing app locally
+
+prom-stack     Installs the kube-prometheus-stack community Helm chart
+uninstall-prom-stack  Uninstalls the prometheus stack
 
 endef
 
@@ -53,28 +56,14 @@ ttl: ttl-debug
 	rm kpost.sh
 	rm resources.yaml
 
-cicd-debug: install-common
-	echo "- name: ghcr.io/lago-morph/chiller_frontend" >> kustomization.yaml
-	echo "  newTag: $(CICD_TAG)" >> kustomization.yaml
-	echo "- name: ghcr.io/lago-morph/chiller_load" >> kustomization.yaml
-	echo "  newTag: $(CICD_TAG)" >> kustomization.yaml
-	echo "- name: ghcr.io/lago-morph/chiller_api" >> kustomization.yaml
-	echo "  newTag: $(CICD_TAG)" >> kustomization.yaml
-	helm install chiller ./chiller --post-renderer ./kpost.sh
-
-cicd: cicd-debug
-	rm kustomization.yaml
-	rm kpost.sh
-	rm resources.yaml
-
-uninstall:
+uninstall-chiller:
 	helm uninstall chiller
 
 port-prom:
-	kubectl port-forward -n monitoring --address=192.168.88.130 svc/prometheus-k8s 9090
+	kubectl port-forward -n monitoring --address=192.168.88.130 svc/prometheus-operated 9090
 
 port-graf:
-	kubectl port-forward -n monitoring --address=192.168.88.130 svc/grafana 3000
+	kubectl port-forward -n monitoring --address=192.168.88.130 svc/prom-stack-grafana 3000:80
 
 port-load:
 	kubectl port-forward --address=127.0.0.1 svc/chiller-frontend 8222:80
@@ -82,3 +71,21 @@ port-load:
 port-app:
 	kubectl port-forward --address=192.168.88.130 svc/chiller-frontend 8080:80
 
+cicd:
+	helm install chiller ./chiller --set appTag=$(CICD_TAG)
+
+prom-stack:
+	helm install prom-stack prometheus-community/kube-prometheus-stack --set namespaceOverride=monitoring --set grafana.namespaceOverride=monitoring --set grafana.adminPassword=admin --set kube-state-metrics.namespaceOverride=monitoring --set prometheus-node-exporter.namespaceOverride=monitoring --create-namespace
+
+uninstall-prom-stack:
+	helm uninstall prom-stack
+	kubectl delete crd alertmanagerconfigs.monitoring.coreos.com
+	kubectl delete crd alertmanagers.monitoring.coreos.com
+	kubectl delete crd podmonitors.monitoring.coreos.com
+	kubectl delete crd probes.monitoring.coreos.com
+	kubectl delete crd prometheusagents.monitoring.coreos.com
+	kubectl delete crd prometheuses.monitoring.coreos.com
+	kubectl delete crd prometheusrules.monitoring.coreos.com
+	kubectl delete crd scrapeconfigs.monitoring.coreos.com
+	kubectl delete crd servicemonitors.monitoring.coreos.com
+	kubectl delete crd thanosrulers.monitoring.coreos.com
