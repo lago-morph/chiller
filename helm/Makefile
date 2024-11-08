@@ -63,7 +63,7 @@ port-prom:
 	kubectl port-forward -n monitoring --address=192.168.88.130 svc/prometheus-operated 9090
 
 port-graf:
-	kubectl port-forward -n monitoring --address=192.168.88.130 svc/prom-stack-grafana 3000:80
+	kubectl port-forward -n monitoring --address=192.168.88.130 svc/kube-prometheus-stack-grafana 3000:80
 
 port-load:
 	kubectl port-forward --address=127.0.0.1 svc/chiller-frontend 8222:80
@@ -75,10 +75,10 @@ cicd:
 	helm install chiller ./chiller --set appTag=$(CICD_TAG)
 
 prom-stack:
-	helm install prom-stack prometheus-community/kube-prometheus-stack --set namespaceOverride=monitoring --set grafana.namespaceOverride=monitoring --set grafana.adminPassword=admin --set kube-state-metrics.namespaceOverride=monitoring --set prometheus-node-exporter.namespaceOverride=monitoring --create-namespace
+	helm install prom-stack prometheus-community/kube-prometheus-stack --set grafana.adminPassword=admin --create-namespace --namespace monitoring
 
 uninstall-prom-stack:
-	helm uninstall prom-stack
+	helm uninstall prom-stack --namespace monitoring
 	kubectl delete crd alertmanagerconfigs.monitoring.coreos.com
 	kubectl delete crd alertmanagers.monitoring.coreos.com
 	kubectl delete crd podmonitors.monitoring.coreos.com
