@@ -4,7 +4,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     name: {{ .app }}-{{ .component }}
-    release: prom-stack
+    release: kube-prometheus-stack
   name: {{ .app }}-{{ .component }}
 spec:
   endpoints:
