@@ -6,6 +6,9 @@ Load test 1 user:               load-1
 Load test 10 users:             load-10
 
 Make sure port 8222 is forwarded
+Set up venv with
+. ~/run/locust/.venv/bin/activate
+
 endef
 
 LOCALHOST := 127.0.0.1
