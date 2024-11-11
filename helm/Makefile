@@ -6,7 +6,6 @@ ttl            Installs with ttl.io images with files in /tmp
 
 uninstall-chiller      Uninstalls chiller
 
-
 port-prom      Port forwarding for Prometheus
 port-graf      Port forwarding for Grafana
 port-load      Port forwarding for load testing
@@ -14,6 +13,8 @@ port-app       Port forwarding for accessing app locally
 
 prom-stack     Installs the kube-prometheus-stack community Helm chart
 uninstall-prom-stack  Uninstalls the prometheus stack
+
+get-ingress    Shows the URL for the ingress to an AWS ALB
 
 endef
 
@@ -89,3 +90,6 @@ uninstall-prom-stack:
 	kubectl delete crd scrapeconfigs.monitoring.coreos.com
 	kubectl delete crd servicemonitors.monitoring.coreos.com
 	kubectl delete crd thanosrulers.monitoring.coreos.com
+
+get-ingress:
+	kubectl get ingress ingress-chiller -o json | jq .status.loadBalancer.ingress[0].hostname | sed -e "s/\"//g" | sed -e "s/^/http:\/\//"
